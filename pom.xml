@@ -55,13 +55,10 @@
         <jacoco.version>0.7.3.201502191951</jacoco.version>
 
         <fastjson.version>1.2.24</fastjson.version>
-        <guava.version>19.0</guava.version>
-
-        <commons-lang3.version>3.4</commons-lang3.version>
-        <commons-io.version>2.4</commons-io.version>
-        <commons-math.version>3.2</commons-math.version>
 
         <lombok.version>1.16.6</lombok.version>
+
+        <jama.version>1.0.3</jama.version>
     </properties>
 
     <profiles>
@@ -400,15 +397,11 @@
         </dependency>
 
 
-
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-math3</artifactId>
-            <version>${commons-math.version}</version>
+            <groupId>gov.nist.math</groupId>
+            <artifactId>jama</artifactId>
+            <version>${jama.version}</version>
         </dependency>
-
-
 
     </dependencies>
 
