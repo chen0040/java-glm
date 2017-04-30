@@ -1,4 +1,4 @@
-package com.xschen.works.glm.search.cgs;
+package com.xschen.works.glm.search.methods.cgs;
 
 /**
  * Created by xschen on 12/8/15.

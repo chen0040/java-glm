@@ -7,9 +7,9 @@ import com.xschen.works.glm.maths.MatrixOp;
 import com.xschen.works.glm.metrics.GlmStatistics;
 import com.xschen.works.glm.search.CostEvaluationMethod;
 import com.xschen.works.glm.search.GradientEvaluationMethod;
-import com.xschen.works.glm.search.OPModule;
+import com.xschen.works.glm.search.LocalSearch;
 import com.xschen.works.glm.search.TerminationEvaluationMethod;
-import com.xschen.works.glm.search.cgs.NonlinearCGSearch;
+import com.xschen.works.glm.search.methods.cgs.NonlinearCGSearch;
 import com.xschen.works.glm.search.solutions.NumericSolution;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -49,7 +49,7 @@ public class Glm implements Cloneable {
         return iteration >= maxIters;
     };
     protected double[] glmCoefficients;
-    private OPModule solver;
+    private LocalSearch solver;
     private double[][] A; //first column of A corresponds to x_0 = 1
     private double[] b;
     protected CostEvaluationMethod evaluateCost = new CostEvaluationMethod() {
@@ -116,7 +116,7 @@ public class Glm implements Cloneable {
 
     }
 
-    public Glm(GlmDistributionFamily distribution, LinkFunction linkFunc, double[][] A, double[] b, OPModule solver) {
+    public Glm(GlmDistributionFamily distribution, LinkFunction linkFunc, double[][] A, double[] b, LocalSearch solver) {
         this.mDistributionFamily = distribution;
         this.solver = solver;
         this.linkFunc = linkFunc;
@@ -125,7 +125,7 @@ public class Glm implements Cloneable {
         this.mStats = new GlmStatistics(A[0].length, b.length);
     }
 
-    public Glm(GlmDistributionFamily distribution, double[][] A, double[] b, OPModule solver) {
+    public Glm(GlmDistributionFamily distribution, double[][] A, double[] b, LocalSearch solver) {
         this.solver = solver;
         this.mDistributionFamily = distribution;
         this.linkFunc = getLinkFunction(distribution);
@@ -149,7 +149,7 @@ public class Glm implements Cloneable {
         this.mDistributionFamily = distribution;
     }
 
-    public Glm(GlmDistributionFamily distribution, double[][] A, double[] b, OPModule solver, int maxIters) {
+    public Glm(GlmDistributionFamily distribution, double[][] A, double[] b, LocalSearch solver, int maxIters) {
         this.solver = solver;
         this.mDistributionFamily = distribution;
         this.linkFunc = getLinkFunction(distribution);
@@ -212,7 +212,7 @@ public class Glm implements Cloneable {
 
         glmCoefficients = rhs.glmCoefficients == null ? null : rhs.glmCoefficients.clone();
 
-        solver = rhs.solver== null ? null : (OPModule)rhs.solver.clone();
+        solver = rhs.solver== null ? null : (LocalSearch)rhs.solver.clone();
 
         A = rhs.A == null ? null : rhs.A.clone(); //first column of A corresponds to x_0 = 1
         b = rhs.b == null ? null : rhs.b.clone();

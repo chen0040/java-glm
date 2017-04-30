@@ -1,4 +1,4 @@
-package com.xschen.works.glm.search.cgs;
+package com.xschen.works.glm.search.methods.cgs;
 
 
 import com.xschen.works.glm.search.*;
@@ -10,11 +10,11 @@ import com.xschen.works.glm.search.solutions.NumericSolutionUpdateResult;
 /**
  * Created by xschen on 12/8/15.
  */
-public class NonlinearCGSearch extends OPModule {
+public class NonlinearCGSearch extends LocalSearch {
     private BetaFormula betaFormula;
 
     @Override
-    public void copy(OPModule rhs){
+    public void copy(LocalSearch rhs){
         super.copy(rhs);
 
         NonlinearCGSearch rhs2 = (NonlinearCGSearch)rhs;

@@ -13,13 +13,13 @@ import java.util.Random;
 /**
  * Created by xschen on 12/8/15.
  */
-public abstract class OPModule implements Cloneable {
+public abstract class LocalSearch implements Cloneable {
     private static Random rand = new Random();
     private double[] upperBounds;
     private double[] lowerBounds;
     private SearchListenerService listenerService;
 
-    public void copy(OPModule rhs){
+    public void copy(LocalSearch rhs){
         upperBounds = rhs.upperBounds == null ? null : rhs.upperBounds.clone();
         lowerBounds = rhs.lowerBounds == null ? null : rhs.lowerBounds.clone();
     }
@@ -29,7 +29,7 @@ public abstract class OPModule implements Cloneable {
         throw new NotImplementedException();
     }
 
-    public OPModule(){
+    public LocalSearch(){
         listenerService = new SearchListenerService();
     }
 
