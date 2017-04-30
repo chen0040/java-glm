@@ -1,4 +1,7 @@
-package com.xschen.works.glm.operators;
+package com.xschen.works.glm.search;
+
+
+import com.xschen.works.glm.search.solutions.NumericSolutionUpdateResult;
 
 
 /**

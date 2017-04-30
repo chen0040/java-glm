@@ -2,7 +2,7 @@ package com.xschen.works.glm.data;
 
 
 /**
- * Created by memeanalytics on 18/8/15.
+ * Created by xschen on 18/8/15.
  */
 public class Coefficients {
     private double[] values;
