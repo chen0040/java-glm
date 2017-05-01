@@ -10,7 +10,7 @@ import com.xschen.works.glm.search.solutions.NumericSolutionUpdateResult;
 
 
 /**
- * Created by memeanalytics on 23/8/15.
+ * Created by xschen on 23/8/15.
  */
 public class SweepingSearch extends LocalSearch {
 
@@ -25,7 +25,7 @@ public class SweepingSearch extends LocalSearch {
     }
 
     @Override
-    public Object clone(){
+    public LocalSearch makeCopy(){
         SweepingSearch clone = new SweepingSearch();
         clone.copy(this);
 

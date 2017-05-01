@@ -212,7 +212,7 @@ public class Glm implements Cloneable {
 
         glmCoefficients = rhs.glmCoefficients == null ? null : rhs.glmCoefficients.clone();
 
-        solver = rhs.solver== null ? null : (LocalSearch)rhs.solver.clone();
+        solver = rhs.solver== null ? null : rhs.solver.makeCopy();
 
         A = rhs.A == null ? null : rhs.A.clone(); //first column of A corresponds to x_0 = 1
         b = rhs.b == null ? null : rhs.b.clone();
@@ -221,8 +221,7 @@ public class Glm implements Cloneable {
         evaluateGradient = rhs.evaluateGradient;
     }
 
-    @Override
-    public Object clone(){
+    public Glm makeCopy(){
         Glm clone = new Glm();
         clone.copy(this);
         return clone;

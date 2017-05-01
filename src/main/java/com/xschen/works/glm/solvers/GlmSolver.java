@@ -7,24 +7,28 @@ import com.xschen.works.glm.data.DataRow;
 import com.xschen.works.glm.enums.GlmDistributionFamily;
 import com.xschen.works.glm.enums.GlmSolverType;
 import com.xschen.works.glm.metrics.GlmStatistics;
+import lombok.Getter;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
 /**
- * Created by memeanalytics on 16/8/15.
+ * Created by xschen on 16/8/15.
  */
+@Getter
+@Setter
 public class GlmSolver {
 
     private static final Logger logger = LoggerFactory.getLogger(GlmSolver.class);
 
-    protected Glm solver;
-    protected GlmDistributionFamily distributionFamily;
-    protected GlmSolverType solverType;
-    protected Coefficients coefficients;
+    private Glm solver;
+    private GlmDistributionFamily distributionFamily;
+    private GlmSolverType solverType;
+    private Coefficients coefficients;
     
     public void copy(GlmSolver that){
-        solver = that.solver == null ? null : (Glm)that.solver.clone();
+        solver = that.solver == null ? null : that.solver.makeCopy();
         distributionFamily = that.distributionFamily;
         solverType = that.solverType;
         coefficients = that.coefficients == null ? null : that.coefficients.makeCopy();

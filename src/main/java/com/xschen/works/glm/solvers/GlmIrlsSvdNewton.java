@@ -42,7 +42,7 @@ public class GlmIrlsSvdNewton extends Glm {
     }
 
     @Override
-    public Object clone(){
+    public Glm makeCopy(){
         GlmIrlsSvdNewton clone = new GlmIrlsSvdNewton();
         clone.copy(this);
 

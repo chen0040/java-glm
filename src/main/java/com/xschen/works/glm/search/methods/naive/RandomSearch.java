@@ -12,7 +12,7 @@ import java.util.Random;
 
 
 /**
- * Created by memeanalytics on 12/8/15.
+ * Created by xschen on 12/8/15.
  */
 public class RandomSearch extends LocalSearch {
 
@@ -22,7 +22,7 @@ public class RandomSearch extends LocalSearch {
     }
 
     @Override
-    public Object clone(){
+    public LocalSearch makeCopy(){
         RandomSearch clone = new RandomSearch();
         clone.copy(this);
         return clone;

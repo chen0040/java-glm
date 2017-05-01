@@ -63,7 +63,7 @@ public class GlmIrls extends Glm {
     }
 
     @Override
-    public Object clone(){
+    public Glm makeCopy(){
         GlmIrls clone = new GlmIrls();
         clone.copy(this);
 

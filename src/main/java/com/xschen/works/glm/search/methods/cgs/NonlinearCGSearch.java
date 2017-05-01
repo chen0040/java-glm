@@ -22,7 +22,7 @@ public class NonlinearCGSearch extends LocalSearch {
     }
 
     @Override
-    public Object clone(){
+    public LocalSearch makeCopy(){
         NonlinearCGSearch clone = new NonlinearCGSearch();
         clone.copy(this);
 
