@@ -31,7 +31,7 @@ public class GlmIrlsUnitTest {
                 .selectColumn(column_age)
                 .selectColumn(column_age, age -> Math.pow(StringUtils.parseDouble(age), 2))
                 .selectColumn(column_urban)
-                .selectTargetColumn(column_use)
+                .selectTargetColumn(column_use, label -> label.equals("Y") ? 1.0 : 0.0)
                 .build();
 
 
