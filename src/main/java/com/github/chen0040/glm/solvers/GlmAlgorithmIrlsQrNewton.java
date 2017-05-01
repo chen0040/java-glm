@@ -24,7 +24,7 @@ import java.util.Random;
 /// The cholesky factorization used to compute s requires W be positive definite matrix (i.e., z * W * z be positive for any vector z),
 /// The positive definite matrix requirement can be easily checked by examining the diagonal entries of the weight matrix W
 /// </summary>
-public class GlmIrlsQrNewton extends Glm {
+public class GlmAlgorithmIrlsQrNewton extends GlmAlgorithm {
     private final static double EPSILON = 1e-20;
     private static Random rand = new Random();
     private Matrix A;
@@ -32,28 +32,28 @@ public class GlmIrlsQrNewton extends Glm {
     private Matrix At;
 
     @Override
-    public void copy(Glm rhs){
+    public void copy(GlmAlgorithm rhs){
         super.copy(rhs);
 
-        GlmIrlsQrNewton rhs2 = (GlmIrlsQrNewton)rhs;
+        GlmAlgorithmIrlsQrNewton rhs2 = (GlmAlgorithmIrlsQrNewton)rhs;
         A = rhs2.A == null ? null : (Matrix)rhs2.A.clone();
         b = rhs2.b == null ? null : (Matrix)rhs2.b.clone();
         At = rhs2.At == null ? null : (Matrix)rhs2.At.clone();
     }
 
     @Override
-    public Glm makeCopy(){
-        GlmIrlsQrNewton clone = new GlmIrlsQrNewton();
+    public GlmAlgorithm makeCopy(){
+        GlmAlgorithmIrlsQrNewton clone = new GlmAlgorithmIrlsQrNewton();
         clone.copy(this);
 
         return clone;
     }
 
-    public GlmIrlsQrNewton(){
+    public GlmAlgorithmIrlsQrNewton(){
 
     }
 
-    public GlmIrlsQrNewton(GlmDistributionFamily distribution, LinkFunction linkFunc, double[][] A, double[] b)
+    public GlmAlgorithmIrlsQrNewton(GlmDistributionFamily distribution, LinkFunction linkFunc, double[][] A, double[] b)
 
     {
         super(distribution, linkFunc, null, null, null);
@@ -63,7 +63,7 @@ public class GlmIrlsQrNewton extends Glm {
         this.mStats = new GlmStatistics(A[0].length, b.length);
     }
 
-    public GlmIrlsQrNewton(GlmDistributionFamily distribution, double[][] A, double[] b) {
+    public GlmAlgorithmIrlsQrNewton(GlmDistributionFamily distribution, double[][] A, double[] b) {
         super(distribution);
         this.A = toMatrix(A);
         this.b = columnVector(b);

@@ -1,19 +1,18 @@
 package com.github.chen0040.glm.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 /**
  * Created by xschen on 12/8/15.
  */
 public class FileUtils {
-    public static File getResourceFile(String fileName) {
+    public static InputStream getResourceFile(String fileName) throws IOException {
 
-        //StringBuilder result = new StringBuilder("");
-
-        //Get file from resources folder
         ClassLoader classLoader = FileUtils.class.getClassLoader();
-        return new File(classLoader.getResource(fileName).getFile());
+        return classLoader.getResource(fileName).openStream();
 
     }
 }

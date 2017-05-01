@@ -46,35 +46,35 @@ import com.github.chen0040.glm.metrics.GlmStatistics;
 /// unstable and not generally advised, use the QR or SVD variant of IRLS instead
 ///
 /// </summary>
-public class GlmIrls extends Glm {
+public class GlmAlgorithmIrls extends GlmAlgorithm {
     private final static double EPSILON = 1e-20;
     private Matrix A;
     private Matrix b;
     private Matrix At;
 
     @Override
-    public void copy(Glm rhs){
+    public void copy(GlmAlgorithm rhs){
         super.copy(rhs);
 
-        GlmIrls rhs2 = (GlmIrls)rhs;
+        GlmAlgorithmIrls rhs2 = (GlmAlgorithmIrls)rhs;
         A = rhs2.A == null ? null : (Matrix)rhs2.A.clone();
         b = rhs2.b == null ? null : (Matrix)rhs2.b.clone();
         At = rhs2.At == null ? null : (Matrix)rhs2.At.clone();
     }
 
     @Override
-    public Glm makeCopy(){
-        GlmIrls clone = new GlmIrls();
+    public GlmAlgorithm makeCopy(){
+        GlmAlgorithmIrls clone = new GlmAlgorithmIrls();
         clone.copy(this);
 
         return clone;
     }
 
-    public GlmIrls(){
+    public GlmAlgorithmIrls(){
         super();
     }
 
-    public GlmIrls(GlmDistributionFamily distribution, LinkFunction linkFunc, double[][] A, double[] b)
+    public GlmAlgorithmIrls(GlmDistributionFamily distribution, LinkFunction linkFunc, double[][] A, double[] b)
 
     {
         super(distribution, linkFunc, null, null, null);
@@ -84,7 +84,7 @@ public class GlmIrls extends Glm {
         this.mStats = new GlmStatistics(A[0].length, b.length);
     }
 
-    public GlmIrls(GlmDistributionFamily distribution, double[][] A, double[] b)
+    public GlmAlgorithmIrls(GlmDistributionFamily distribution, double[][] A, double[] b)
 
     {
         super(distribution);

@@ -14,15 +14,13 @@ public class CsvUtils {
 
 
 
-   public static boolean csv(String filename, String cvsSplitBy, Function<String[], Boolean> onLineReady, Consumer<Exception> onFailed){
-      BufferedReader br = null;
+   public static boolean csv(InputStream inputStream, String cvsSplitBy, Function<String[], Boolean> onLineReady, Consumer<Exception> onFailed){
+
       String line;
       if(cvsSplitBy==null) cvsSplitBy = ",";
 
       boolean success = true;
-      try {
-
-         br = new BufferedReader(new StringReader(filename));
+      try(BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
          while ((line = br.readLine()) != null) {
 
             line = line.trim();
@@ -46,26 +44,14 @@ public class CsvUtils {
             if(onLineReady != null){
                onLineReady.apply(values);
             }
+
          }
 
-      } catch (FileNotFoundException e) {
+      }
+      catch (IOException e) {
          success = false;
          if(onFailed != null) onFailed.accept(e);
          else e.printStackTrace();
-      } catch (IOException e) {
-         success = false;
-         if(onFailed != null) onFailed.accept(e);
-         else e.printStackTrace();
-      } finally {
-         if (br != null) {
-            try {
-               br.close();
-            } catch (IOException e) {
-               success = false;
-               if(onFailed != null) onFailed.accept(e);
-               else e.printStackTrace();
-            }
-         }
       }
 
       return success;

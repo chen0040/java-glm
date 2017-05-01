@@ -25,35 +25,35 @@ import com.github.chen0040.glm.maths.Variance;
 /// Note that SVD is also potentially much stable compare to the basic IRLS as it uses pseudo inverse
 /// Note that SVD is slower if m >> n since it involves  m dimension multiplication and the SVD for large m is costly
 /// </summary>
-public class GlmIrlsSvdNewton extends Glm {
+public class GlmAlgorithmIrlsSvdNewton extends GlmAlgorithm {
     private static final double EPSILON = 1e-34;
     private Matrix A;
     private Matrix b;
     private Matrix At;
 
     @Override
-    public void copy(Glm rhs){
+    public void copy(GlmAlgorithm rhs){
         super.copy(rhs);
 
-        GlmIrlsSvdNewton rhs2 = (GlmIrlsSvdNewton)rhs;
+        GlmAlgorithmIrlsSvdNewton rhs2 = (GlmAlgorithmIrlsSvdNewton)rhs;
         A = rhs2.A == null ? null : (Matrix)rhs2.A.clone();
         b = rhs2.b == null ? null : (Matrix)rhs2.b.clone();
         At = rhs2.At == null ? null : (Matrix)rhs2.At.clone();
     }
 
     @Override
-    public Glm makeCopy(){
-        GlmIrlsSvdNewton clone = new GlmIrlsSvdNewton();
+    public GlmAlgorithm makeCopy(){
+        GlmAlgorithmIrlsSvdNewton clone = new GlmAlgorithmIrlsSvdNewton();
         clone.copy(this);
 
         return clone;
     }
 
-    public GlmIrlsSvdNewton(){
+    public GlmAlgorithmIrlsSvdNewton(){
 
     }
 
-    public GlmIrlsSvdNewton(GlmDistributionFamily distribution, LinkFunction linkFunc, double[][] A, double[] b)
+    public GlmAlgorithmIrlsSvdNewton(GlmDistributionFamily distribution, LinkFunction linkFunc, double[][] A, double[] b)
     {
         super(distribution, linkFunc, null, null, null);
         this.A = new Matrix(A);
@@ -62,7 +62,7 @@ public class GlmIrlsSvdNewton extends Glm {
         this.mStats = new GlmStatistics(A[0].length, b.length);
     }
 
-    public GlmIrlsSvdNewton(GlmDistributionFamily distribution, double[][] A, double[] b)
+    public GlmAlgorithmIrlsSvdNewton(GlmDistributionFamily distribution, double[][] A, double[] b)
     {
         super(distribution);
         this.A = new Matrix(A);

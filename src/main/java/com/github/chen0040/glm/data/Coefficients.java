@@ -1,21 +1,25 @@
 package com.github.chen0040.glm.data;
 
 
+import com.github.chen0040.glm.utils.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
 /**
  * Created by xschen on 18/8/15.
  */
 public class Coefficients {
-    private double[] values;
-    private Level[] descriptors;
+    private final List<Double> values = new ArrayList<>();
+    private final List<DataColumn> descriptors = new ArrayList<>();
 
     public void copy(Coefficients rhs){
-        values = rhs.values == null ? null : rhs.values.clone();
-        descriptors = null;
-        if(rhs.descriptors != null){
-            descriptors = new Level[rhs.descriptors.length];
-            for(int i=0; i < rhs.descriptors.length; ++i){
-                descriptors[i] = rhs.descriptors[i] == null ? null : (Level)rhs.descriptors[i].makeCopy();
-            }
+        values.clear();
+        values.addAll(CollectionUtils.clone(rhs.values, x -> x));
+        descriptors.clear();
+        for(int i=0; i < rhs.descriptors.size(); ++i){
+            descriptors.add(rhs.descriptors.get(i).makeCopy());
         }
     }
 
@@ -28,38 +32,40 @@ public class Coefficients {
     public Coefficients() {
     }
 
-    public double[] getValues() {
-        return values;
+    public List<Double> getValues() {
+        return CollectionUtils.clone(values, x -> x);
     }
 
-    public void setValues(double[] values) {
-        this.values=values;
+    public void setValues(List<Double> values) {
+        this.values.clear();
+        this.values.addAll(CollectionUtils.clone(values, x -> x));
     }
 
-    public Level[] getDescriptors() {
-        return descriptors;
+    public List<DataColumn> getDescriptors() {
+        return CollectionUtils.clone(descriptors, DataColumn::makeCopy);
     }
 
-    public void setDescriptors(Level[] descriptors){
-        this.descriptors = descriptors;
+    public void setDescriptors(List<DataColumn> descriptors){
+        this.descriptors.clear();
+        this.descriptors.addAll(CollectionUtils.clone(descriptors, DataColumn::makeCopy));
     }
 
     public int size() {
-        return values==null ? 0 : values.length;
+        return values.size();
     }
 
     @Override
     public String toString() {
-        if(values==null || descriptors==null){
+        if(values.isEmpty()){
             return "(null)";
         }
+
         StringBuilder sb = new StringBuilder();
 
-
         sb.append("{");
-        sb.append(String.format("\"(Intercepter)\":%f, ", values[0]));
-        for (int i = 1; i < values.length; ++i){
-            sb.append(String.format(", \"%s\":%f", descriptors[i-1].toString(), values[i]));
+        sb.append(String.format("\"(Intercepter)\":%f, ", values.get(0)));
+        for (int i = 1; i < values.size(); ++i){
+            sb.append(String.format(", \"%s\":%f", descriptors.get(i-1).toString(), values.get(i)));
         }
         sb.append("}");
         return sb.toString();

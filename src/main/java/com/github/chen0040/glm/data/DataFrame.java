@@ -1,6 +1,9 @@
 package com.github.chen0040.glm.data;
 
 
+import java.util.List;
+
+
 /**
  * Created by xschen on 28/4/2017.
  */
@@ -9,5 +12,11 @@ public interface DataFrame {
 
    DataRow row(int i);
 
-   Level[] descriptors();
+   List<DataColumn> descriptors();
+
+   void inspect();
+
+   DataRow newRow();
+
+   void addRow(DataRow row);
 }
