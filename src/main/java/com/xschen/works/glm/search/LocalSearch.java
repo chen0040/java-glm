@@ -24,8 +24,7 @@ public abstract class LocalSearch implements Cloneable {
         lowerBounds = rhs.lowerBounds == null ? null : rhs.lowerBounds.clone();
     }
 
-    @Override
-    public Object clone(){
+    public LocalSearch makeCopy(){
         throw new NotImplementedException();
     }
 

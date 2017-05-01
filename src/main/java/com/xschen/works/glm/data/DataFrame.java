@@ -8,4 +8,6 @@ public interface DataFrame {
    int rowCount();
 
    DataRow row(int i);
+
+   Level[] descriptors();
 }
