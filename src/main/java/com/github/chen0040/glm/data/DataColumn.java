@@ -13,7 +13,7 @@ public class DataColumn implements Serializable {
 
    private int sourceColumnIndex;
    private String columnName;
-   private Set<Integer> levels = new HashSet<>();
+   private Set<Double> levels = new HashSet<>();
 
    public DataColumn makeCopy() {
       DataColumn clone = new DataColumn();
@@ -41,7 +41,7 @@ public class DataColumn implements Serializable {
       return columnName;
    }
 
-   public void setLevels(Set<Integer> set) {
+   public void setLevels(Set<Double> set) {
       levels = set;
    }
 

@@ -30,11 +30,11 @@ public class DenseDataFrame implements DataFrame {
 
 
    @Override public void inspect() {
-      Map<String, Set<Integer>> counts = new HashMap<>();
+      Map<String, Set<Double>> counts = new HashMap<>();
       for(DataRow row : rows){
          List<String> keys = row.columnNames();
          for(String key: keys) {
-            Set<Integer> set;
+            Set<Double> set;
 
             if(counts.containsKey(key)){
                set = counts.get(key);
@@ -43,13 +43,13 @@ public class DenseDataFrame implements DataFrame {
                counts.put(key, set);
             }
 
-            set.add(NumberUtils.toInt(row.get(key)));
+            set.add(row.get(key));
 
          }
       }
 
-      for(Map.Entry<String, Set<Integer>> entry : counts.entrySet()){
-         Set<Integer> set = entry.getValue();
+      for(Map.Entry<String, Set<Double>> entry : counts.entrySet()){
+         Set<Double> set = entry.getValue();
          DataColumn dataColumn = new DataColumn();
          dataColumn.setColumnName(entry.getKey());
          if(set.size() < rowCount() / 3) {
