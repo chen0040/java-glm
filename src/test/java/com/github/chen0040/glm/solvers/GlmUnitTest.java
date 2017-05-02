@@ -32,7 +32,9 @@ public class GlmUnitTest {
         int column_urban = 6;
 
         frame = DataFrameBuilder.csv(FileUtils.getResourceFile("contraception.csv"), ",")
-                .selectColumn("livch", column_livch)
+                .selectColumn("livch1", column_livch, channel -> channel.equals("1") ? 1.0 : 0.0)
+                .selectColumn("livch2", column_livch, channel -> channel.equals("2") ? 1.0 : 0.0)
+                .selectColumn("livch3", column_livch, channel -> channel.contains("3") ? 1.0 : 0.0)
                 .selectColumn("age", column_age)
                 .selectColumn("age^2", column_age, age -> Math.pow(StringUtils.parseDouble(age), 2))
                 .selectColumn("urban", column_urban, label -> label.equals("Y") ? 1.0 : 0.0)

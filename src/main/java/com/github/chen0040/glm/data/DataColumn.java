@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public class DataColumn implements Serializable {
 
-   private int columnIndex;
+   private int sourceColumnIndex;
    private String columnName;
    private Set<Integer> levels = new HashSet<>();
 
@@ -22,15 +22,15 @@ public class DataColumn implements Serializable {
    }
 
    public void copy(DataColumn that) {
-      this.columnIndex = that.columnIndex;
+      this.sourceColumnIndex = that.sourceColumnIndex;
       this.columnName = that.columnName;
       this.levels.clear();
       this.levels.addAll(that.levels);
    }
 
 
-   public void setColumnIndex(int key) {
-      this.columnIndex = key;
+   public void setSourceColumnIndex(int key) {
+      this.sourceColumnIndex = key;
    }
 
    public void setColumnName(String columnName) {
@@ -48,5 +48,12 @@ public class DataColumn implements Serializable {
    @Override
    public String toString(){
       return columnName;
+   }
+
+
+   public String summary() {
+      StringBuilder sb = new StringBuilder();
+      sb.append(columnName).append(":discrete=").append(levels.size());
+      return sb.toString();
    }
 }

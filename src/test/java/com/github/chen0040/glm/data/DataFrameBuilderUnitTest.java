@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.testng.Assert.*;
 
@@ -40,6 +41,12 @@ public class DataFrameBuilderUnitTest {
       }
 
       logger.info("row count: {}", frame.rowCount());
+
+      List<DataColumn> columnList = frame.columns();
+
+      for (int i=0; i < columnList.size(); ++i){
+         logger.info("column: {}", columnList.get(i).summary());
+      }
 
    }
 
