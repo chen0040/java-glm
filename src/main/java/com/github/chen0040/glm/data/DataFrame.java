@@ -14,7 +14,11 @@ public interface DataFrame {
 
    List<DataColumn> columns();
 
-   void inspect();
+   void unlock();
+
+   boolean isLocked();
+
+   void lock();
 
    DataRow newRow();
 

@@ -3,7 +3,6 @@ package com.github.chen0040.glm.utils;
 
 import com.github.chen0040.glm.data.DataRow;
 import com.github.chen0040.glm.data.DenseDataRow;
-import com.github.chen0040.glm.data.SparseDataRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -13,6 +13,7 @@ public class DenseDataFrame implements DataFrame {
 
    private final List<DataRow> rows = new ArrayList<>();
    private final List<DataColumn> dataColumns = new ArrayList<>();
+   private boolean locked = false;
 
    @Override public int rowCount() {
       return rows.size();
@@ -28,8 +29,17 @@ public class DenseDataFrame implements DataFrame {
       return dataColumns;
    }
 
+   @Override public void unlock(){
+      locked = false;
+   }
 
-   @Override public void inspect() {
+   @Override
+   public boolean isLocked() {
+      return locked;
+   }
+
+
+   @Override public void lock() {
       Map<String, Set<Double>> counts = new HashMap<>();
       for(DataRow row : rows){
          List<String> keys = row.columnNames();
@@ -73,6 +83,9 @@ public class DenseDataFrame implements DataFrame {
 
 
    @Override public void addRow(DataRow row) {
+      if(locked) {
+         throw new RuntimeException("Data frame is currently locked, please unlock first");
+      }
       rows.add(row);
    }
 

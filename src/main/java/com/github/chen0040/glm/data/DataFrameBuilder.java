@@ -104,7 +104,7 @@ public class DataFrameBuilder {
             }
          }
 
-         dataFrame.inspect();
+         dataFrame.lock();
 
          return dataFrame;
       }
