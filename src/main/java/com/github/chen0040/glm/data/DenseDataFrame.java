@@ -24,7 +24,7 @@ public class DenseDataFrame implements DataFrame {
    }
 
 
-   @Override public List<DataColumn> descriptors() {
+   @Override public List<DataColumn> columns() {
       return dataColumns;
    }
 

@@ -12,7 +12,7 @@ public interface DataFrame {
 
    DataRow row(int i);
 
-   List<DataColumn> descriptors();
+   List<DataColumn> columns();
 
    void inspect();
 
