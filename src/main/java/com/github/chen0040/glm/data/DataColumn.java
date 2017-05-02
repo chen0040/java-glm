@@ -37,6 +37,10 @@ public class DataColumn implements Serializable {
       this.columnName = columnName;
    }
 
+   public String getColumnName() {
+      return columnName;
+   }
+
    public void setLevels(Set<Integer> set) {
       levels = set;
    }

@@ -56,7 +56,13 @@ public class DenseDataFrame implements DataFrame {
             dataColumn.setLevels(set);
          }
          dataColumns.add(dataColumn);
+      }
 
+      for(int i=0; i < rowCount(); ++i) {
+         DataRow row = row(i);
+         dataColumns.stream().filter(c -> !row.containsColumn(c.getColumnName())).forEach(c -> {
+            row.put(c.getColumnName(), 0.0);
+         });
       }
    }
 

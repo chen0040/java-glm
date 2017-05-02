@@ -19,7 +19,7 @@ public class DenseDataRow implements DataRow {
    private List<String> targetColumns = new ArrayList<>();
 
    @Override public double target() {
-      if(targetColumns.isEmpty()){
+      if(targetColumns.size() < targets.size()){
          buildTargetColumns();
       }
       return targets.get(targetColumns.get(0));
@@ -33,8 +33,13 @@ public class DenseDataRow implements DataRow {
    }
 
 
+   @Override public boolean containsColumn(String columnName) {
+      return values.containsKey(columnName);
+   }
+
+
    @Override public double[] toArray() {
-      if(columns.isEmpty()){
+      if(columns.size() < values.size()){
          buildColumns();
       }
       double[] result = new double[columns.size()];
@@ -63,7 +68,7 @@ public class DenseDataRow implements DataRow {
 
 
    @Override public List<String> columnNames() {
-      if(columns.isEmpty()) {
+      if(columns.size() < values.size()) {
          buildColumns();
       }
       return columns;
@@ -71,7 +76,7 @@ public class DenseDataRow implements DataRow {
 
    @Override
    public List<String> targetColumnNames() {
-      if(targetColumns.isEmpty()){
+      if(targetColumns.size() < targets.size()){
          buildTargetColumns();
       }
       return targetColumns;

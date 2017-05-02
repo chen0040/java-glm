@@ -21,4 +21,6 @@ public interface DataRow {
    double get(String key);
 
    void target(String name, Double value);
+
+   boolean containsColumn(String columnName);
 }

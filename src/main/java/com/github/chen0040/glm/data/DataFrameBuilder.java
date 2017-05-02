@@ -1,6 +1,7 @@
 package com.github.chen0040.glm.data;
 
 
+import com.github.chen0040.glm.enums.DataFileType;
 import com.github.chen0040.glm.utils.CsvUtils;
 import com.github.chen0040.glm.utils.StringUtils;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public class DataFrameBuilder {
 
    public interface SourceBuilder {
       DataFrameQueryBuilder csv(InputStream inputStream, String splitter);
+      DataFrameQueryBuilder heartScale(InputStream inputStream);
    }
 
    private static class DataFrameColumn {
@@ -54,8 +56,9 @@ public class DataFrameBuilder {
 
       private final List<DataFrameColumn> columns = new ArrayList<>();
       private final List<DataFrameColumn> targetColumns = new ArrayList<>();
-      private InputStream csvInputStream;
+      private InputStream dataInputStream;
       private String csvSplitter;
+      private DataFileType fileType;
 
       private static final Logger logger = LoggerFactory.getLogger(DataFrameBuilderX.class);
 
@@ -74,25 +77,32 @@ public class DataFrameBuilder {
       @Override public DataFrame build() {
          final DenseDataFrame dataFrame = new DenseDataFrame();
 
-         CsvUtils.csv(csvInputStream, csvSplitter, (words) -> {
-            DataRow row = dataFrame.newRow();
-            for(int i=0; i < words.length; ++i){
-               for(DataFrameColumn c : columns){
-                  if(c.index == i){
-                     row.put(c.columnName, c.transformer.apply(words[i]));
+         if(fileType == DataFileType.Csv) {
+            CsvUtils.csv(dataInputStream, csvSplitter, (words) -> {
+               DataRow row = dataFrame.newRow();
+               for (int i = 0; i < words.length; ++i) {
+                  for (DataFrameColumn c : columns) {
+                     if (c.index == i) {
+                        row.put(c.columnName, c.transformer.apply(words[i]));
+                     }
+                  }
+                  for (DataFrameColumn c : targetColumns) {
+                     if (c.index == i) {
+                        row.target(c.columnName, c.transformer.apply(words[i]));
+                     }
                   }
                }
-               for(DataFrameColumn c : targetColumns) {
-                  if(c.index == i) {
-                     row.target(c.columnName, c.transformer.apply(words[i]));
-                  }
-               }
+               dataFrame.addRow(row);
+               return true;
+            }, (e) -> {
+               logger.error("Failed to read csv file", e);
+            });
+         } else {
+            List<DataRow> rows = CsvUtils.readHeartScale(dataInputStream);
+            for(DataRow row : rows){
+               dataFrame.addRow(row);
             }
-            dataFrame.addRow(row);
-            return true;
-         }, (e) -> {
-            logger.error("Failed to read csv file", e);
-         });
+         }
 
          dataFrame.inspect();
 
@@ -101,8 +111,16 @@ public class DataFrameBuilder {
 
 
       @Override public DataFrameQueryBuilder csv(InputStream inputStream, String splitter) {
-         csvInputStream = inputStream;
+         dataInputStream = inputStream;
          csvSplitter = splitter;
+         fileType = DataFileType.Csv;
+         return this;
+      }
+
+
+      @Override public DataFrameQueryBuilder heartScale(InputStream inputStream) {
+         dataInputStream = inputStream;
+         fileType = DataFileType.HeartScale;
          return this;
       }
    }
@@ -111,7 +129,15 @@ public class DataFrameBuilder {
       return new DataFrameBuilderX().csv(new FileInputStream(path), splitter);
    }
 
+   public static DataFrameQueryBuilder heartScale(String path) throws  FileNotFoundException {
+      return new DataFrameBuilderX().heartScale(new FileInputStream(path));
+   }
+
    public static DataFrameQueryBuilder csv(InputStream inputStream, String splitter) {
       return new DataFrameBuilderX().csv(inputStream, splitter);
+   }
+
+   public static DataFrameQueryBuilder heartScale(InputStream inputStream) {
+      return new DataFrameBuilderX().heartScale(inputStream);
    }
 }

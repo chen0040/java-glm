@@ -20,4 +20,8 @@ public class StringUtils {
       return sentence;
    }
 
+
+   public static boolean isEmpty(String line) {
+      return line == null || line.equals("");
+   }
 }
