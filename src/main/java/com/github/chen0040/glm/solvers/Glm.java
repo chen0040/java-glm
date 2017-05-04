@@ -133,4 +133,17 @@ public class Glm {
     public Coefficients getCoefficients(){
         return coefficients;
     }
+
+
+    public static Glm logistic() {
+        Glm glm = new Glm();
+        glm.setDistributionFamily(GlmDistributionFamily.Binomial);
+        return glm;
+    }
+
+    public static Glm linear() {
+        Glm glm = new Glm();
+        glm.setDistributionFamily(GlmDistributionFamily.Normal);
+        return glm;
+    }
 }

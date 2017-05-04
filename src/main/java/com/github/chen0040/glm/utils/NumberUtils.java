@@ -8,4 +8,9 @@ public class NumberUtils {
    public static int toInt(double value){
       return (int)value;
    }
+
+   public static boolean isZero(Double val) {
+      return Math.abs(val) < 0.0000000000000000000001;
+   }
+
 }

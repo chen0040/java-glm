@@ -4,6 +4,7 @@ import com.github.chen0040.glm.data.DataFrame;
 import com.github.chen0040.glm.data.DataFrameBuilder;
 import com.github.chen0040.glm.enums.GlmDistributionFamily;
 import com.github.chen0040.glm.enums.GlmSolverType;
+import com.github.chen0040.glm.evaluators.BinaryClassifierEvaluator;
 import com.github.chen0040.glm.utils.FileUtils;
 import com.github.chen0040.glm.utils.StringUtils;
 import org.slf4j.Logger;
@@ -47,59 +48,59 @@ public class GlmUnitTest {
     }
 
     @Test
-    public void test_glm_irls() {
+    public void test_logistic_irls() {
 
 
-        Glm glm = new Glm();
-        glm.setDistributionFamily(GlmDistributionFamily.Binomial);
+        Glm glm = Glm.logistic();
         glm.setSolverType(GlmSolverType.GlmIrls);
         glm.fit(frame);
 
+        BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
 
         for(int i = 0; i < frame.rowCount(); ++i){
-            logger.info("predicted(Irls): {}\texpected: {}",
-                    glm.transform(frame.row(i)),
-                    frame.row(i).target());
+            boolean predicted = glm.transform(frame.row(i)) > 0.5;
+            boolean actual = frame.row(i).target() > 0.5;
+            logger.info("predicted(Irls): {}\texpected: {}", predicted, actual);
+            evaluator.evaluate(actual, predicted);
         }
 
         logger.info("Coefficients(Irls): {}", glm.getCoefficients());
+        evaluator.report();
     }
 
     @Test
-    public void test_glm_irls_qr() {
-
-
-        Glm glm = new Glm();
-        glm.setDistributionFamily(GlmDistributionFamily.Binomial);
+    public void test_logistic_irls_qr() {
+        Glm glm = Glm.logistic();
         glm.setSolverType(GlmSolverType.GlmIrlsQr);
         glm.fit(frame);
 
-
+        BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
         for(int i = 0; i < frame.rowCount(); ++i){
-            logger.info("predicted(IrlsQr): {}\texpected: {}",
-                    glm.transform(frame.row(i)),
-                    frame.row(i).target());
+            boolean predicted = glm.transform(frame.row(i)) > 0.5;
+            boolean actual = frame.row(i).target() > 0.5;
+            logger.info("predicted(IrlsQr): {}\texpected: {}", predicted, actual);
+            evaluator.evaluate(actual, predicted);
         }
 
         logger.info("Coefficients(IrlsQr): {}", glm.getCoefficients());
+        evaluator.report();
     }
 
     @Test
-    public void test_glm_irls_svd() {
-
-
-        Glm glm = new Glm();
-        glm.setDistributionFamily(GlmDistributionFamily.Binomial);
+    public void test_logistic_irls_svd() {
+        Glm glm = Glm.logistic();
         glm.setSolverType(GlmSolverType.GlmIrlsSvd);
         glm.fit(frame);
 
-
+        BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
         for(int i = 0; i < frame.rowCount(); ++i){
-            logger.info("predicted(IrlsSvd): {}\texpected: {}",
-                    glm.transform(frame.row(i)),
-                    frame.row(i).target());
+            boolean predicted = glm.transform(frame.row(i)) > 0.5;
+            boolean actual = frame.row(i).target() > 0.5;
+            logger.info("predicted(IrlsSvd): {}\texpected: {}", predicted, actual);
+            evaluator.evaluate(actual, predicted);
         }
 
         logger.info("Coefficients(IrlsSvd): {}", glm.getCoefficients());
+        evaluator.report();
     }
 }
