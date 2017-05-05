@@ -4,6 +4,8 @@ package com.github.chen0040.glm.applications;
 import com.github.chen0040.glm.data.DataFrame;
 import com.github.chen0040.glm.data.DataQuery;
 import com.github.chen0040.glm.data.Sampler;
+import com.github.chen0040.glm.enums.GlmSolverType;
+import com.github.chen0040.glm.evaluators.BinaryClassifierEvaluator;
 import com.github.chen0040.glm.solvers.Glm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,37 +55,39 @@ public class LogisticRegressionUnitTest {
               .forColumn("anomaly").generate((name, index) -> 0.0)
               .end();
 
+      Sampler.DataSampleBuilder positiveSampler = new Sampler()
+              .forColumn("c1").generate((name, index) -> rand(-4, 4))
+              .forColumn("c2").generate((name, index) -> rand(-4, 4))
+              .forColumn("anomaly").generate((name, index) -> 1.0)
+              .end();
+
       DataFrame trainingData = schema.build();
 
       trainingData = negativeSampler.sample(trainingData, 200);
+      trainingData = positiveSampler.sample(trainingData, 200);
 
       System.out.println(trainingData.head(10));
 
       DataFrame crossValidationData = schema.build();
 
       crossValidationData = negativeSampler.sample(crossValidationData, 40);
+      crossValidationData = positiveSampler.sample(crossValidationData, 40);
 
-      DataFrame outliers = schema.build();
-
-      outliers = new Sampler()
-              .forColumn("c1").generate((name, index) -> rand(-4, 4))
-              .forColumn("c2").generate((name, index) -> rand(-4, 4))
-              .forColumn("anomaly").generate((name, index) -> 1.0)
-              .end().sample(outliers, 40);
-
-      final double threshold = 0.5;
       Glm algorithm = Glm.logistic();
+      algorithm.setSolverType(GlmSolverType.GlmIrlsQr);
       algorithm.fit(trainingData);
 
+      BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
+
       for(int i = 0; i < crossValidationData.rowCount(); ++i){
-         double predicted = algorithm.transform(crossValidationData.row(i));
-         logger.info("predicted: {}\texpected: {}", predicted, crossValidationData.row(i).target());
+         boolean predicted = algorithm.transform(crossValidationData.row(i)) > 0.5;
+         boolean actual = crossValidationData.row(i).target() > 0.5;
+         evaluator.evaluate(actual, predicted);
+         logger.info("predicted: {}\texpected: {}", predicted, actual);
       }
 
-      for(int i = 0; i < outliers.rowCount(); ++i){
-         double predicted = algorithm.transform(outliers.row(i));
-         logger.info("outlier predicted: {}\texpected: {}", predicted, outliers.row(i).target());
-      }
+      evaluator.report();
+
 
 
    }

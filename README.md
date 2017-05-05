@@ -82,7 +82,7 @@ Currently csv files and the libsvm format are supported for creating data frame,
  
 In the future more option will be added for the supported format
 
-## Step 2: Create and train the glm against the data frame
+## Step 2: Create and train the glm against the training data in step 1
  
 Suppose you want to create logistic regression model from GLM and train the logistic regression model against the data frame 
 
@@ -99,7 +99,7 @@ The line "Glm.logistic()" create the logistic regression model, which can be eas
 
 The line "glm.fit(..)" performs the GLM training.
 
-## Step 3: Use the trained glm to perform regression on data
+## Step 3: Use the trained regression model to predict on new data
 
 To run the trained glm against the test data, load the testing data into another data frame:
 
@@ -129,6 +129,44 @@ for(int i = 0; i < testingData.rowCount(); ++i){
 
 The line "glm.transform(..)" perform the regression 
 
+## Another example on linear regression
+
+```
+DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()
+      .newInput("x1")
+      .newInput("x2")
+      .newOutput("y")
+      .end();
+
+// y = 4 + 0.5 * x1 + 0.2 * x2
+Sampler.DataSampleBuilder sampler = new Sampler()
+      .forColumn("x1").generate((name, index) -> randn() * 0.3 + index)
+      .forColumn("x2").generate((name, index) -> randn() * 0.3 + index * index)
+      .forColumn("y").generate((name, index) -> 4 + 0.5 * index + 0.2 * index * index + randn() * 0.3)
+      .end();
+
+DataFrame trainingData = schema.build();
+
+trainingData = sampler.sample(trainingData, 200);
+
+System.out.println(trainingData.head(10));
+
+DataFrame crossValidationData = schema.build();
+
+crossValidationData = sampler.sample(crossValidationData, 40);
+
+Glm glm = Glm.linear();
+glm.setSolverType(GlmSolverType.GlmIrlsQr);
+glm.fit(trainingData);
+
+for(int i = 0; i < crossValidationData.rowCount(); ++i){
+ double predicted = glm.transform(crossValidationData.row(i));
+ double actual = crossValidationData.row(i).target();
+ System.out.println("predicted: " + predicted + "\texpected: " + actual);
+}
+
+System.out.println("Coefficients: " + glm.getCoefficients());
+```
 
 # Background on GLM 
 
