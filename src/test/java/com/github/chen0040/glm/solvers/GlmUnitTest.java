@@ -12,6 +12,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.junit.Assert.assertTrue;
 
@@ -31,15 +32,18 @@ public class GlmUnitTest {
         int column_age = 5;
         int column_urban = 6;
 
-        frame = DataQuery.csv(",")
-                .from(FileUtils.getResourceFile("contraception.csv"))
-                .selectColumn(column_livch).transform(channel -> channel.equals("1") ? 1.0 : 0.0).asInput("livch1")
-                .selectColumn(column_livch).transform(channel -> channel.equals("2") ? 1.0 : 0.0).asInput("livch2")
-                .selectColumn(column_livch).transform(channel -> channel.contains("3") ? 1.0 : 0.0).asInput("livch3")
+        boolean skipFirstLine = true;
+        String columnSplitter = ",";
+        InputStream inputStream = FileUtils.getResourceFile("contraception.csv");
+        frame = DataQuery.csv(columnSplitter, skipFirstLine)
+                .from(inputStream)
+                .selectColumn(column_livch).transform(cell -> cell.equals("1") ? 1.0 : 0.0).asInput("livch1")
+                .selectColumn(column_livch).transform(cell -> cell.equals("2") ? 1.0 : 0.0).asInput("livch2")
+                .selectColumn(column_livch).transform(cell -> cell.equals("3+") ? 1.0 : 0.0).asInput("livch3")
                 .selectColumn(column_age).asInput("age")
-                .selectColumn(column_age).transform(age -> Math.pow(StringUtils.parseDouble(age), 2)).asInput("age^2")
-                .selectColumn(column_urban).transform(label -> label.equals("Y") ? 1.0 : 0.0).asInput("urban")
-                .selectColumn(column_use).transform(label -> label.equals("Y") ? 1.0 : 0.0).asOutput("use")
+                .selectColumn(column_age).transform(cell -> Math.pow(StringUtils.parseDouble(cell), 2)).asInput("age^2")
+                .selectColumn(column_urban).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asInput("urban")
+                .selectColumn(column_use).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asOutput("use")
                 .build();
 
         for(int i=0; i < 10; ++i){

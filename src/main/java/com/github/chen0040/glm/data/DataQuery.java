@@ -35,7 +35,7 @@ public class DataQuery {
    }
 
    public interface FormatBuilder {
-      SourceBuilder csv(String splitter);
+      SourceBuilder csv(String splitter, boolean skipFirstLine);
       SourceBuilder libsvm();
    }
 
@@ -62,6 +62,7 @@ public class DataQuery {
       private InputStream dataInputStream;
       private String csvSplitter;
       private DataFileType fileType;
+      private boolean skipFirstLine = false;
 
       private static final Logger logger = LoggerFactory.getLogger(DataFrameBuilderX.class);
 
@@ -76,7 +77,7 @@ public class DataQuery {
          final DenseDataFrame dataFrame = new DenseDataFrame();
 
          if(fileType == DataFileType.Csv) {
-            CsvUtils.csv(dataInputStream, csvSplitter, (words) -> {
+            CsvUtils.csv(dataInputStream, csvSplitter, skipFirstLine, (words) -> {
                DataRow row = dataFrame.newRow();
                for (int i = 0; i < words.length; ++i) {
                   for (DataFrameColumn c : inputColumns) {
@@ -108,8 +109,8 @@ public class DataQuery {
       }
 
 
-      @Override public SourceBuilder csv(String splitter) {
-
+      @Override public SourceBuilder csv(String splitter, boolean skipFirstLine) {
+         this.skipFirstLine = skipFirstLine;
          csvSplitter = splitter;
          fileType = DataFileType.Csv;
          return this;
@@ -154,7 +155,7 @@ public class DataQuery {
       return new DataFrameBuilderX().libsvm();
    }
 
-   public static SourceBuilder csv(String splitter) {
-      return new DataFrameBuilderX().csv(splitter);
+   public static SourceBuilder csv(String splitter, boolean skipFirstLine) {
+      return new DataFrameBuilderX().csv(splitter, skipFirstLine);
    }
 }

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 
@@ -26,8 +27,11 @@ public class DataQueryUnitTest {
       int column_age = 5;
       int column_urban = 6;
 
-      DataFrame frame = DataQuery.csv(",")
-              .from(FileUtils.getResourceFile("contraception.csv"))
+      boolean skipFirstLine = true;
+      String columnSplitter = ",";
+      InputStream inputStream = FileUtils.getResourceFile("contraception.csv");
+      DataFrame frame = DataQuery.csv(columnSplitter, skipFirstLine)
+              .from(inputStream)
               .selectColumn(column_livch).asInput("livch")
               .selectColumn(column_age).asInput("age")
               .selectColumn(column_age).transform(age -> Math.pow(StringUtils.parseDouble(age), 2)).asInput("age^2")
