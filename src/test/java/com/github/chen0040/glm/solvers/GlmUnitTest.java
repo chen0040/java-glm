@@ -1,8 +1,7 @@
 package com.github.chen0040.glm.solvers;
 
 import com.github.chen0040.glm.data.DataFrame;
-import com.github.chen0040.glm.data.DataFrameBuilder;
-import com.github.chen0040.glm.enums.GlmDistributionFamily;
+import com.github.chen0040.glm.data.DataQuery;
 import com.github.chen0040.glm.enums.GlmSolverType;
 import com.github.chen0040.glm.evaluators.BinaryClassifierEvaluator;
 import com.github.chen0040.glm.utils.FileUtils;
@@ -32,14 +31,15 @@ public class GlmUnitTest {
         int column_age = 5;
         int column_urban = 6;
 
-        frame = DataFrameBuilder.csv(FileUtils.getResourceFile("contraception.csv"), ",")
-                .selectColumn("livch1", column_livch, channel -> channel.equals("1") ? 1.0 : 0.0)
-                .selectColumn("livch2", column_livch, channel -> channel.equals("2") ? 1.0 : 0.0)
-                .selectColumn("livch3", column_livch, channel -> channel.contains("3") ? 1.0 : 0.0)
-                .selectColumn("age", column_age)
-                .selectColumn("age^2", column_age, age -> Math.pow(StringUtils.parseDouble(age), 2))
-                .selectColumn("urban", column_urban, label -> label.equals("Y") ? 1.0 : 0.0)
-                .selectTargetColumn("use", column_use, label -> label.equals("Y") ? 1.0 : 0.0)
+        frame = DataQuery.csv(",")
+                .from(FileUtils.getResourceFile("contraception.csv"))
+                .selectColumn(column_livch).transform(channel -> channel.equals("1") ? 1.0 : 0.0).asInput("livch1")
+                .selectColumn(column_livch).transform(channel -> channel.equals("2") ? 1.0 : 0.0).asInput("livch2")
+                .selectColumn(column_livch).transform(channel -> channel.contains("3") ? 1.0 : 0.0).asInput("livch3")
+                .selectColumn(column_age).asInput("age")
+                .selectColumn(column_age).transform(age -> Math.pow(StringUtils.parseDouble(age), 2)).asInput("age^2")
+                .selectColumn(column_urban).transform(label -> label.equals("Y") ? 1.0 : 0.0).asInput("urban")
+                .selectColumn(column_use).transform(label -> label.equals("Y") ? 1.0 : 0.0).asOutput("use")
                 .build();
 
         for(int i=0; i < 10; ++i){

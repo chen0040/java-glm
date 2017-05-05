@@ -21,23 +21,26 @@ import java.util.function.Function;
 
 
 
-public class DataFrameBuilder {
+public class DataQuery {
 
    public interface DataFrameQueryBuilder {
-      default DataFrameQueryBuilder selectColumn(String columName, int columnIndex) {
-         return selectColumn(columName, columnIndex, StringUtils::parseDouble);
-      }
-      DataFrameQueryBuilder selectColumn(String columName, int columnIndex, Function<String, Double> columnTransformer);
-      default DataFrameQueryBuilder selectTargetColumn(String columnName, int columnIndex) {
-         return selectTargetColumn(columnName, columnIndex, StringUtils::parseDouble);
-      }
-      DataFrameQueryBuilder selectTargetColumn(String columName, int columnIndex, Function<String, Double> columnTransformer);
+      DataColumnBuilder selectColumn(int columnIndex);
       DataFrame build();
    }
 
+   public interface DataColumnBuilder {
+      DataColumnBuilder transform(Function<String, Double> columnTransformer);
+      DataFrameQueryBuilder asInput(String columnName);
+      DataFrameQueryBuilder asOutput(String columnName);
+   }
+
+   public interface FormatBuilder {
+      SourceBuilder csv(String splitter);
+      SourceBuilder libsvm();
+   }
+
    public interface SourceBuilder {
-      DataFrameQueryBuilder csv(InputStream inputStream, String splitter);
-      DataFrameQueryBuilder heartScale(InputStream inputStream);
+      DataFrameQueryBuilder from(InputStream inputStream);
    }
 
    private static class DataFrameColumn {
@@ -52,27 +55,22 @@ public class DataFrameBuilder {
       }
    }
 
-   private static class DataFrameBuilderX implements SourceBuilder, DataFrameQueryBuilder {
+   private static class DataFrameBuilderX implements SourceBuilder, DataFrameQueryBuilder, DataColumnBuilder, FormatBuilder {
 
-      private final List<DataFrameColumn> columns = new ArrayList<>();
-      private final List<DataFrameColumn> targetColumns = new ArrayList<>();
+      private final List<DataFrameColumn> inputColumns = new ArrayList<>();
+      private final List<DataFrameColumn> outputColumns = new ArrayList<>();
       private InputStream dataInputStream;
       private String csvSplitter;
       private DataFileType fileType;
 
       private static final Logger logger = LoggerFactory.getLogger(DataFrameBuilderX.class);
 
-      @Override public DataFrameQueryBuilder selectColumn(String columnName, int columnIndex, Function<String, Double> columnTransformer) {
-         columns.add(new DataFrameColumn(columnName, columnIndex, columnTransformer));
+      private DataFrameColumn selected = null;
+
+      @Override public DataColumnBuilder selectColumn(int columnIndex) {
+         selected = new DataFrameColumn("", columnIndex, StringUtils::parseDouble);
          return this;
       }
-
-
-      @Override public DataFrameQueryBuilder selectTargetColumn(String columnName, int columnIndex, Function<String, Double> columnTransformer) {
-         targetColumns.add(new DataFrameColumn(columnName, columnIndex, columnTransformer));
-         return this;
-      }
-
 
       @Override public DataFrame build() {
          final DenseDataFrame dataFrame = new DenseDataFrame();
@@ -81,12 +79,12 @@ public class DataFrameBuilder {
             CsvUtils.csv(dataInputStream, csvSplitter, (words) -> {
                DataRow row = dataFrame.newRow();
                for (int i = 0; i < words.length; ++i) {
-                  for (DataFrameColumn c : columns) {
+                  for (DataFrameColumn c : inputColumns) {
                      if (c.index == i) {
                         row.put(c.columnName, c.transformer.apply(words[i]));
                      }
                   }
-                  for (DataFrameColumn c : targetColumns) {
+                  for (DataFrameColumn c : outputColumns) {
                      if (c.index == i) {
                         row.target(c.columnName, c.transformer.apply(words[i]));
                      }
@@ -110,34 +108,53 @@ public class DataFrameBuilder {
       }
 
 
-      @Override public DataFrameQueryBuilder csv(InputStream inputStream, String splitter) {
-         dataInputStream = inputStream;
+      @Override public SourceBuilder csv(String splitter) {
+
          csvSplitter = splitter;
          fileType = DataFileType.Csv;
          return this;
       }
 
-
-      @Override public DataFrameQueryBuilder heartScale(InputStream inputStream) {
+      @Override public DataFrameQueryBuilder from(InputStream inputStream) {
          dataInputStream = inputStream;
+         return this;
+      }
+
+
+      @Override public SourceBuilder libsvm() {
          fileType = DataFileType.HeartScale;
+         return this;
+      }
+
+
+      @Override public DataColumnBuilder transform(Function<String, Double> columnTransformer) {
+         selected.transformer = columnTransformer;
+         return this;
+      }
+
+
+      @Override public DataFrameQueryBuilder asInput(String columnName) {
+         selected.columnName = columnName;
+         inputColumns.add(selected);
+         selected = null;
+         return this;
+      }
+
+
+      @Override public DataFrameQueryBuilder asOutput(String columnName) {
+         selected.columnName = columnName;
+         outputColumns.add(selected);
+         selected = null;
          return this;
       }
    }
 
-   public static DataFrameQueryBuilder csv(String path, String splitter) throws FileNotFoundException {
-      return new DataFrameBuilderX().csv(new FileInputStream(path), splitter);
+
+   public static SourceBuilder libsvm() {
+      return new DataFrameBuilderX().libsvm();
    }
 
-   public static DataFrameQueryBuilder heartScale(String path) throws  FileNotFoundException {
-      return new DataFrameBuilderX().heartScale(new FileInputStream(path));
-   }
-
-   public static DataFrameQueryBuilder csv(InputStream inputStream, String splitter) {
-      return new DataFrameBuilderX().csv(inputStream, splitter);
-   }
-
-   public static DataFrameQueryBuilder heartScale(InputStream inputStream) {
-      return new DataFrameBuilderX().heartScale(inputStream);
+   public static SourceBuilder csv(String splitter) {
+      return new DataFrameBuilderX().csv(splitter);
    }
 }

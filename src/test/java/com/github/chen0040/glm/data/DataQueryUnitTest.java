@@ -10,15 +10,13 @@ import org.testng.annotations.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static org.testng.Assert.*;
-
 
 /**
  * Created by xschen on 2/5/2017.
  */
-public class DataFrameBuilderUnitTest {
+public class DataQueryUnitTest {
 
-   private Logger logger = LoggerFactory.getLogger(DataFrameBuilderUnitTest.class);
+   private Logger logger = LoggerFactory.getLogger(DataQueryUnitTest.class);
 
    @Test
    public void test_csv() throws IOException {
@@ -28,12 +26,13 @@ public class DataFrameBuilderUnitTest {
       int column_age = 5;
       int column_urban = 6;
 
-      DataFrame frame = DataFrameBuilder.csv(FileUtils.getResourceFile("contraception.csv"), ",")
-              .selectColumn("livch", column_livch)
-              .selectColumn("age", column_age)
-              .selectColumn("age^2", column_age, age -> Math.pow(StringUtils.parseDouble(age), 2))
-              .selectColumn("urban", column_urban, label -> label.equals("Y") ? 1.0 : 0.0)
-              .selectTargetColumn("use", column_use, label -> label.equals("Y") ? 1.0 : 0.0)
+      DataFrame frame = DataQuery.csv(",")
+              .from(FileUtils.getResourceFile("contraception.csv"))
+              .selectColumn(column_livch).asInput("livch")
+              .selectColumn(column_age).asInput("age")
+              .selectColumn(column_age).transform(age -> Math.pow(StringUtils.parseDouble(age), 2)).asInput("age^2")
+              .selectColumn(column_urban).transform(label -> label.equals("Y") ? 1.0 : 0.0).asInput("urban")
+              .selectColumn(column_use).transform(label -> label.equals("Y") ? 1.0 : 0.0).asOutput("use")
               .build();
 
       for(int i=0; i < 10; ++i){
@@ -52,7 +51,7 @@ public class DataFrameBuilderUnitTest {
 
    @Test
    public void test_heartScale() throws IOException {
-      DataFrame frame = DataFrameBuilder.heartScale(FileUtils.getResourceFile("heart_scale.txt")).build();
+      DataFrame frame = DataQuery.libsvm().from(FileUtils.getResourceFile("heart_scale.txt")).build();
 
       for(int i=0; i < 10; ++i){
          logger.info("row[{}]: {}", i, frame.row(i));
