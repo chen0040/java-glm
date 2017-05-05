@@ -42,7 +42,7 @@ public class CsvUtils {
       return value;
    }
 
-   public static List<DataRow> readHeartScale(InputStream inputStream){
+   public static List<Map<Integer, String>> readHeartScale(InputStream inputStream){
       try(BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))){
          List<String> lines = reader.lines().collect(Collectors.toList());
          return lines.stream()
@@ -52,28 +52,19 @@ public class CsvUtils {
                     StringTokenizer st = new StringTokenizer(line, " \t\n\r\f:");
 
                     String label = st.nextToken();
-                    HashMap<Integer, Double> row = new HashMap<>();
+                    Map<Integer, String> row = new HashMap<>();
 
                     int m = st.countTokens() / 2;
                     for (int j = 0; j < m; j++) {
-                       int index = atoi(st.nextToken()) - 1;
-                       double value = atof(st.nextToken());
+                       int index = atoi(st.nextToken());
+                       String value = st.nextToken();
 
                        row.put(index, value);
                     }
 
-                    DataRow dataRow = new BasicDataRow();
 
-                    for(Map.Entry<Integer, Double> entry : row.entrySet()){
-                       dataRow.setCell(entry.getKey() + "", entry.getValue());
-                    }
-
-                    if(label.equals("-1")){
-                       dataRow.setTargetCell("label", -1.0);
-                    } else {
-                       dataRow.setTargetCell("label", 1.0);
-                    }
-                    return dataRow;
+                    row.put(0, label);
+                    return row;
                  })
                  .collect(Collectors.toList());
       }

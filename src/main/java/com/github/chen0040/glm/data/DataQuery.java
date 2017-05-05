@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 
@@ -75,8 +76,13 @@ public class DataQuery {
          final BasicDataFrame dataFrame = new BasicDataFrame();
 
          if(fileType == DataFileType.Csv) {
+            if(inputColumns.isEmpty() || outputColumns.isEmpty()){
+               throw new RuntimeException("data frame should not have either empty input columns or empty output columns");
+            }
+
             CsvUtils.csv(dataInputStream, csvSplitter, skipFirstLine, (words) -> {
                DataRow row = dataFrame.newRow();
+
                for (int i = 0; i < words.length; ++i) {
                   for (DataFrameColumn c : inputColumns) {
                      if (c.index == i) {
@@ -89,23 +95,36 @@ public class DataQuery {
                      }
                   }
                }
+
                dataFrame.addRow(row);
                return true;
             }, (e) -> logger.error("Failed to read csv file", e));
          } else {
-            List<DataRow> rows = CsvUtils.readHeartScale(dataInputStream);
+            List<Map<Integer, String>> rows = CsvUtils.readHeartScale(dataInputStream);
             if(inputColumns.isEmpty() && outputColumns.isEmpty()) {
-               rows.forEach(dataFrame::addRow);
+               for(Map<Integer, String> row : rows) {
+                  DataRow newRow = dataFrame.newRow();
+                  for(Map.Entry<Integer, String> entry : row.entrySet()){
+
+                     int columnIndex = entry.getKey();
+                     if(columnIndex != 0) {
+                        newRow.setCell("" + columnIndex, StringUtils.parseDouble(entry.getValue()));
+                     } else {
+                        newRow.setTargetCell("label", StringUtils.parseDouble(entry.getValue()));
+                     }
+                  }
+                  dataFrame.addRow(newRow);
+               }
             } else if(inputColumns.isEmpty() || outputColumns.isEmpty()) {
                throw new RuntimeException("data frame should not have either empty input columns or empty output columns");
             } else {
-               for (DataRow row : rows) {
+               for (Map<Integer, String> row : rows) {
                   DataRow newRow = dataFrame.newRow();
                   for (DataFrameColumn c : inputColumns) {
-                     newRow.setCell(c.columnName, c.transformer.apply("" + row.getCell(c.columnName)));
+                     newRow.setCell(c.columnName, c.transformer.apply(row.get(c.index)));
                   }
                   for (DataFrameColumn c : outputColumns) {
-                     newRow.setTargetCell(c.columnName, c.transformer.apply("" + row.getTargetCell(c.columnName)));
+                     newRow.setTargetCell(c.columnName, c.transformer.apply(row.get(c.index)));
                   }
                   dataFrame.addRow(newRow);
                }
