@@ -78,7 +78,9 @@ The code above create a data frame which has the following columns
 * urban (input): value = 1 if the "urban" column of the CSV has value "Y" ; 0 otherwise
 * use (output): value = 1 if the "use" column of the CSV has value "Y" ; 0 otherwise
 
-(Currently csv files and the libsvm format are supported for creating data frame, more option will be added in the future) 
+Currently csv files and the libsvm format are supported for creating data frame, to load a libsvm-format file, call "DataQuery.libsvm()" instead of "DataQuery.csv(..)".
+ 
+In the future more option will be added for the supported format
 
 ## Step 2: Create and train the glm against the data frame
  

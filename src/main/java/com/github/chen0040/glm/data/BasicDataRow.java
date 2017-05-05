@@ -81,7 +81,7 @@ public class BasicDataRow implements DataRow {
       if(value == 0.0) {
          values.remove(columnName);
       }
-      
+
       values.put(columnName, value);
    }
 
