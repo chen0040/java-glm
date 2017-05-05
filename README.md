@@ -3,11 +3,29 @@ Package implements the generalized linear model in Java
 
 [![Build Status](https://travis-ci.org/chen0040/java-glm.svg?branch=master)](https://travis-ci.org/chen0040/java-glm) [![Coverage Status](https://coveralls.io/repos/github/chen0040/java-glm/badge.svg?branch=master)](https://coveralls.io/github/chen0040/java-glm?branch=master) 
 
+# Features
+
+The current implementation of GLM supports as many distribution families as glm package in R:
+
+* Normal
+* Exponential
+* Gamma
+* InverseGaussian
+* Poisson
+* Bernouli
+* Binomial
+* Categorical
+* Multinomial
+
+For the solvers, the current implementation of GLM supports a number of variants of the iteratively re-weighted least squares estimation algorithm:
+ 
+* IRLS
+* IRLS with QR factorization
+* IRLS with SVD factorization
+
 # Usage
 
-## Create a data frame from data source
-
-### CSV file
+## Step 1. Create a data frame
 
 Suppose you have a csv file named contraception.csv that has the following file format:
 
@@ -57,9 +75,53 @@ The code above create a data frame which has the following columns
 * urban (input): value = 1 if the "urban" column of the CSV has value "Y" ; 0 otherwise
 * use (output): value = 1 if the "use" column of the CSV has value "Y" ; 0 otherwise
 
+## Step 2: Create and train the glm against the data frame
+ 
+Suppose you want to create logistic regression model from GLM and train the logistic regression model against the data frame 
+
+```java
+import com.github.chen0040.glm.solvers.Glm;
+import com.github.chen0040.glm.enums.GlmSolverType;
+
+Glm glm = Glm.logistic();
+glm.setSolverType(GlmSolverType.GlmIrls);
+glm.fit(frame);
+```
+
+The line "glm.fit(..)" performs the GLM training.
+
+## Step 3: Use the trained glm to perform regression on data
+
+To run the trained glm against the test data, load the testing data into another data frame:
+
+```java
+InputStream inputStream = new FileInputStream("contraception-validation.csv");
+DataFrame testingData = DataQuery.csv(columnSplitter, skipFirstLine)
+        .from(inputStream)
+        .selectColumn(column_livch).transform(cell -> cell.equals("1") ? 1.0 : 0.0).asInput("livch1")
+        .selectColumn(column_livch).transform(cell -> cell.equals("2") ? 1.0 : 0.0).asInput("livch2")
+        .selectColumn(column_livch).transform(cell -> cell.equals("3+") ? 1.0 : 0.0).asInput("livch3")
+        .selectColumn(column_age).asInput("age")
+        .selectColumn(column_age).transform(cell -> Math.pow(StringUtils.parseDouble(cell), 2)).asInput("age^2")
+        .selectColumn(column_urban).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asInput("urban")
+        .selectColumn(column_use).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asOutput("use")
+        .build();
+```
+
+The trained glm can then run on the testing data, below is a java code example for logistic regression:
+
+```java
+for(int i = 0; i < testingData.rowCount(); ++i){
+    boolean predicted = glm.transform(testingData.row(i)) > 0.5;
+    boolean actual = frame.row(i).target() > 0.5;
+    System.out.println("predicted(Irls): " + predicted + "\texpected: " + actual);
+}
+```
+
+The line "glm.transform(..)" perform the regression 
 
 
-# Background
+# Background on GLM 
 
 ## Introduction
 
