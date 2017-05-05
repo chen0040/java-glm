@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class Coefficients {
     private final List<Double> values = new ArrayList<>();
-    private final List<DataColumn> descriptors = new ArrayList<>();
+    private final List<InputDataColumn> descriptors = new ArrayList<>();
 
     public void copy(Coefficients rhs){
         values.clear();
@@ -41,13 +41,13 @@ public class Coefficients {
         this.values.addAll(CollectionUtils.clone(values, x -> x));
     }
 
-    public List<DataColumn> getDescriptors() {
-        return CollectionUtils.clone(descriptors, DataColumn::makeCopy);
+    public List<InputDataColumn> getDescriptors() {
+        return CollectionUtils.clone(descriptors, InputDataColumn::makeCopy);
     }
 
-    public void setDescriptors(List<DataColumn> descriptors){
+    public void setDescriptors(List<InputDataColumn> descriptors){
         this.descriptors.clear();
-        this.descriptors.addAll(CollectionUtils.clone(descriptors, DataColumn::makeCopy));
+        this.descriptors.addAll(CollectionUtils.clone(descriptors, InputDataColumn::makeCopy));
     }
 
     public int size() {

@@ -12,7 +12,7 @@ public interface DataFrame {
 
    DataRow row(int i);
 
-   List<DataColumn> columns();
+   List<InputDataColumn> inputColumns();
 
    void unlock();
 

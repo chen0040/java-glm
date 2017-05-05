@@ -12,15 +12,19 @@ public interface DataRow {
 
    double[] toArray();
 
-   void put(String name, double value);
+   void setCell(String columnName, double value);
 
-   List<String> columnNames();
+   List<String> getColumnNames();
 
-   List<String> targetColumnNames();
+   List<String> getTargetColumnNames();
 
-   double get(String key);
+   double getCell(String key);
 
-   void target(String name, Double value);
+   double getTargetCell(String columnName);
 
-   boolean containsColumn(String columnName);
+   void setTargetCell(String columnName, double value);
+
+   void setColumnNames(List<String> inputColumns);
+
+   void setTargetColumnNames(List<String> outputColumns);
 }

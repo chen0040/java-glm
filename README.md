@@ -78,6 +78,8 @@ The code above create a data frame which has the following columns
 * urban (input): value = 1 if the "urban" column of the CSV has value "Y" ; 0 otherwise
 * use (output): value = 1 if the "use" column of the CSV has value "Y" ; 0 otherwise
 
+(Currently csv files and the libsvm format are supported for creating data frame, more option will be added in the future) 
+
 ## Step 2: Create and train the glm against the data frame
  
 Suppose you want to create logistic regression model from GLM and train the logistic regression model against the data frame 
@@ -90,6 +92,8 @@ Glm glm = Glm.logistic();
 glm.setSolverType(GlmSolverType.GlmIrls);
 glm.fit(frame);
 ```
+
+The line "Glm.logistic()" create the logistic regression model, which can be easily changed to create other regression models (For example, calling "Glm.linear()" create a linear regression model) 
 
 The line "glm.fit(..)" performs the GLM training.
 

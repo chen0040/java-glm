@@ -1,18 +1,17 @@
 package com.github.chen0040.glm.data;
 
 
-import com.github.chen0040.glm.utils.NumberUtils;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
  * Created by xschen on 1/5/2017.
  */
-public class DenseDataFrame implements DataFrame {
+public class BasicDataFrame implements DataFrame {
 
    private final List<DataRow> rows = new ArrayList<>();
-   private final List<DataColumn> dataColumns = new ArrayList<>();
+   private final List<InputDataColumn> inputDataColumns = new ArrayList<>();
    private boolean locked = false;
 
    @Override public int rowCount() {
@@ -25,8 +24,8 @@ public class DenseDataFrame implements DataFrame {
    }
 
 
-   @Override public List<DataColumn> columns() {
-      return dataColumns;
+   @Override public List<InputDataColumn> inputColumns() {
+      return inputDataColumns;
    }
 
    @Override public void unlock(){
@@ -42,7 +41,7 @@ public class DenseDataFrame implements DataFrame {
    @Override public void lock() {
       Map<String, Set<Double>> counts = new HashMap<>();
       for(DataRow row : rows){
-         List<String> keys = row.columnNames();
+         List<String> keys = row.getColumnNames();
          for(String key: keys) {
             Set<Double> set;
 
@@ -53,32 +52,33 @@ public class DenseDataFrame implements DataFrame {
                counts.put(key, set);
             }
 
-            set.add(row.get(key));
-
+            set.add(row.getCell(key));
          }
       }
 
       for(Map.Entry<String, Set<Double>> entry : counts.entrySet()){
          Set<Double> set = entry.getValue();
-         DataColumn dataColumn = new DataColumn();
-         dataColumn.setColumnName(entry.getKey());
+         InputDataColumn inputDataColumn = new InputDataColumn();
+         inputDataColumn.setColumnName(entry.getKey());
          if(set.size() < rowCount() / 3) {
-            dataColumn.setLevels(set);
+            inputDataColumn.setLevels(set);
          }
-         dataColumns.add(dataColumn);
+         inputDataColumns.add(inputDataColumn);
       }
 
+      List<String> inputColumns = inputDataColumns.stream().map(InputDataColumn::getColumnName).collect(Collectors.toList());
+      inputColumns.sort(String::compareTo);
       for(int i=0; i < rowCount(); ++i) {
          DataRow row = row(i);
-         dataColumns.stream().filter(c -> !row.containsColumn(c.getColumnName())).forEach(c -> {
-            row.put(c.getColumnName(), 0.0);
-         });
+         row.setColumnNames(inputColumns);
       }
+
+      locked = true;
    }
 
 
    @Override public DataRow newRow() {
-      return new DenseDataRow();
+      return new BasicDataRow();
    }
 
 

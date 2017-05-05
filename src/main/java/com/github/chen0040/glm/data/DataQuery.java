@@ -7,8 +7,6 @@ import com.github.chen0040.glm.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +72,7 @@ public class DataQuery {
       }
 
       @Override public DataFrame build() {
-         final DenseDataFrame dataFrame = new DenseDataFrame();
+         final BasicDataFrame dataFrame = new BasicDataFrame();
 
          if(fileType == DataFileType.Csv) {
             CsvUtils.csv(dataInputStream, csvSplitter, skipFirstLine, (words) -> {
@@ -82,24 +80,35 @@ public class DataQuery {
                for (int i = 0; i < words.length; ++i) {
                   for (DataFrameColumn c : inputColumns) {
                      if (c.index == i) {
-                        row.put(c.columnName, c.transformer.apply(words[i]));
+                        row.setCell(c.columnName, c.transformer.apply(words[i]));
                      }
                   }
                   for (DataFrameColumn c : outputColumns) {
                      if (c.index == i) {
-                        row.target(c.columnName, c.transformer.apply(words[i]));
+                        row.setTargetCell(c.columnName, c.transformer.apply(words[i]));
                      }
                   }
                }
                dataFrame.addRow(row);
                return true;
-            }, (e) -> {
-               logger.error("Failed to read csv file", e);
-            });
+            }, (e) -> logger.error("Failed to read csv file", e));
          } else {
             List<DataRow> rows = CsvUtils.readHeartScale(dataInputStream);
-            for(DataRow row : rows){
-               dataFrame.addRow(row);
+            if(inputColumns.isEmpty() && outputColumns.isEmpty()) {
+               rows.forEach(dataFrame::addRow);
+            } else if(inputColumns.isEmpty() || outputColumns.isEmpty()) {
+               throw new RuntimeException("data frame should not have either empty input columns or empty output columns");
+            } else {
+               for (DataRow row : rows) {
+                  DataRow newRow = dataFrame.newRow();
+                  for (DataFrameColumn c : inputColumns) {
+                     newRow.setCell(c.columnName, c.transformer.apply("" + row.getCell(c.columnName)));
+                  }
+                  for (DataFrameColumn c : outputColumns) {
+                     newRow.setTargetCell(c.columnName, c.transformer.apply("" + row.getTargetCell(c.columnName)));
+                  }
+                  dataFrame.addRow(newRow);
+               }
             }
          }
 

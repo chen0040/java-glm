@@ -45,7 +45,7 @@ public class DataQueryUnitTest {
 
       logger.info("row count: {}", frame.rowCount());
 
-      List<DataColumn> columnList = frame.columns();
+      List<InputDataColumn> columnList = frame.inputColumns();
 
       for (int i=0; i < columnList.size(); ++i){
          logger.info("column: {}", columnList.get(i).summary());
@@ -54,7 +54,7 @@ public class DataQueryUnitTest {
    }
 
    @Test
-   public void test_heartScale() throws IOException {
+   public void test_libsvm() throws IOException {
       DataFrame frame = DataQuery.libsvm().from(FileUtils.getResourceFile("heart_scale.txt")).build();
 
       for(int i=0; i < 10; ++i){

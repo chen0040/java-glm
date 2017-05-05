@@ -2,7 +2,7 @@ package com.github.chen0040.glm.utils;
 
 
 import com.github.chen0040.glm.data.DataRow;
-import com.github.chen0040.glm.data.DenseDataRow;
+import com.github.chen0040.glm.data.BasicDataRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,16 +62,16 @@ public class CsvUtils {
                        row.put(index, value);
                     }
 
-                    DataRow dataRow = new DenseDataRow();
+                    DataRow dataRow = new BasicDataRow();
 
                     for(Map.Entry<Integer, Double> entry : row.entrySet()){
-                       dataRow.put(entry.getKey() + "", entry.getValue());
+                       dataRow.setCell(entry.getKey() + "", entry.getValue());
                     }
 
                     if(label.equals("-1")){
-                       dataRow.target("label", -1.0);
+                       dataRow.setTargetCell("label", -1.0);
                     } else {
-                       dataRow.target("label", 1.0);
+                       dataRow.setTargetCell("label", 1.0);
                     }
                     return dataRow;
                  })

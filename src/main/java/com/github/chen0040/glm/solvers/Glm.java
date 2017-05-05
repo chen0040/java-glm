@@ -96,7 +96,7 @@ public class Glm {
         int m = dataFrame.rowCount();
         double[][] X = new double[m][];
 
-        coefficients.setDescriptors(dataFrame.columns());
+        coefficients.setDescriptors(dataFrame.inputColumns());
 
         double[] y = new double[m];
         for(int i=0; i < m; ++i){

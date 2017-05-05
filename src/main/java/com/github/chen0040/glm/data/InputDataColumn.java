@@ -9,19 +9,20 @@ import java.util.Set;
 /**
  * Created by xschen on 29/4/2017.
  */
-public class DataColumn implements Serializable {
+public class InputDataColumn implements Serializable {
 
    private int sourceColumnIndex;
    private String columnName;
    private Set<Double> levels = new HashSet<>();
 
-   public DataColumn makeCopy() {
-      DataColumn clone = new DataColumn();
+   public InputDataColumn makeCopy() {
+      InputDataColumn clone = new InputDataColumn();
+
       clone.copy(this);
       return clone;
    }
 
-   public void copy(DataColumn that) {
+   public void copy(InputDataColumn that) {
       this.sourceColumnIndex = that.sourceColumnIndex;
       this.columnName = that.columnName;
       this.levels.clear();
@@ -52,8 +53,6 @@ public class DataColumn implements Serializable {
 
 
    public String summary() {
-      StringBuilder sb = new StringBuilder();
-      sb.append(columnName).append(":discrete=").append(levels.size());
-      return sb.toString();
+      return columnName + ":discrete=" + levels.size();
    }
 }
