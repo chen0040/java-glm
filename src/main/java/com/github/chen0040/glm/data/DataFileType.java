@@ -1,4 +1,4 @@
-package com.github.chen0040.glm.enums;
+package com.github.chen0040.glm.data;
 
 
 /**
@@ -6,5 +6,5 @@ package com.github.chen0040.glm.enums;
  */
 public enum DataFileType {
    Csv,
-   HeartScale
+   Memory, HeartScale
 }

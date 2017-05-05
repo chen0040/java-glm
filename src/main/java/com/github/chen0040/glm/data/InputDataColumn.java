@@ -15,6 +15,14 @@ public class InputDataColumn implements Serializable {
    private String columnName;
    private Set<Double> levels = new HashSet<>();
 
+   public InputDataColumn(){
+
+   }
+
+   public InputDataColumn(String columnName) {
+      this.columnName = columnName;
+   }
+
    public InputDataColumn makeCopy() {
       InputDataColumn clone = new InputDataColumn();
 

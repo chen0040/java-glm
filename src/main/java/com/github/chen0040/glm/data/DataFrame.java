@@ -12,7 +12,9 @@ public interface DataFrame {
 
    DataRow row(int i);
 
-   List<InputDataColumn> inputColumns();
+   List<InputDataColumn> getInputColumns();
+
+   List<OutputDataColumn> getOutputColumns();
 
    void unlock();
 
@@ -23,4 +25,6 @@ public interface DataFrame {
    DataRow newRow();
 
    void addRow(DataRow row);
+
+   String head(int limit);
 }

@@ -45,7 +45,7 @@ public class DataQueryUnitTest {
 
       logger.info("row count: {}", frame.rowCount());
 
-      List<InputDataColumn> columnList = frame.inputColumns();
+      List<InputDataColumn> columnList = frame.getInputColumns();
 
       for (int i=0; i < columnList.size(); ++i){
          logger.info("column: {}", columnList.get(i).summary());

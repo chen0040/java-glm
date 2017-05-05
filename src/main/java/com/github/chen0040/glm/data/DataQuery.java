@@ -1,7 +1,5 @@
 package com.github.chen0040.glm.data;
 
-
-import com.github.chen0040.glm.enums.DataFileType;
 import com.github.chen0040.glm.utils.CsvUtils;
 import com.github.chen0040.glm.utils.StringUtils;
 import org.slf4j.Logger;
@@ -36,6 +34,13 @@ public class DataQuery {
    public interface FormatBuilder {
       SourceBuilder csv(String splitter, boolean skipFirstLine);
       SourceBuilder libsvm();
+      DataTableBuilder blank();
+   }
+
+   public interface  DataTableBuilder {
+      DataTableBuilder newInput(String columnName);
+      DataTableBuilder newOutput(String columnName);
+      DataFrameQueryBuilder end();
    }
 
    public interface SourceBuilder {
@@ -54,7 +59,7 @@ public class DataQuery {
       }
    }
 
-   private static class DataFrameBuilderX implements SourceBuilder, DataFrameQueryBuilder, DataColumnBuilder, FormatBuilder {
+   private static class DataFrameBuilderX implements SourceBuilder, DataFrameQueryBuilder, DataColumnBuilder, FormatBuilder, DataTableBuilder {
 
       private final List<DataFrameColumn> inputColumns = new ArrayList<>();
       private final List<DataFrameColumn> outputColumns = new ArrayList<>();
@@ -99,7 +104,7 @@ public class DataQuery {
                dataFrame.addRow(row);
                return true;
             }, (e) -> logger.error("Failed to read csv file", e));
-         } else {
+         } else if(fileType == DataFileType.HeartScale) {
             List<Map<Integer, String>> rows = CsvUtils.readHeartScale(dataInputStream);
             if(inputColumns.isEmpty() && outputColumns.isEmpty()) {
                for(Map<Integer, String> row : rows) {
@@ -129,9 +134,21 @@ public class DataQuery {
                   dataFrame.addRow(newRow);
                }
             }
+         } else if(fileType == DataFileType.Memory) {
+            dataFrame.getInputColumns().clear();
+            dataFrame.getOutputColumns().clear();
+
+            for(DataFrameColumn c : inputColumns) {
+               dataFrame.getInputColumns().add(new InputDataColumn(c.columnName));
+            }
+            for(DataFrameColumn c : outputColumns) {
+               dataFrame.getOutputColumns().add(new OutputDataColumn(c.columnName));
+            }
          }
 
-         dataFrame.lock();
+         if(fileType != DataFileType.Memory) {
+            dataFrame.lock();
+         }
 
          return dataFrame;
       }
@@ -156,6 +173,12 @@ public class DataQuery {
       }
 
 
+      @Override public DataTableBuilder blank() {
+         fileType = DataFileType.Memory;
+         return this;
+      }
+
+
       @Override public DataColumnBuilder transform(Function<String, Double> columnTransformer) {
          selected.transformer = columnTransformer;
          return this;
@@ -176,6 +199,29 @@ public class DataQuery {
          selected = null;
          return this;
       }
+
+
+      @Override public DataTableBuilder newInput(String columnName) {
+         inputColumns.add(new DataFrameColumn(columnName, -1, StringUtils::parseDouble));
+         return this;
+      }
+
+
+      @Override public DataTableBuilder newOutput(String columnName) {
+         outputColumns.add(new DataFrameColumn(columnName, -1, StringUtils::parseDouble));
+         return this;
+      }
+
+
+      @Override public DataFrameQueryBuilder end() {
+         if(inputColumns.isEmpty()){
+            throw new RuntimeException("input columns cannot be empty!");
+         }
+         if(outputColumns.isEmpty()) {
+            throw new RuntimeException("output columns cannot be empty!");
+         }
+         return this;
+      }
    }
 
 
@@ -185,5 +231,9 @@ public class DataQuery {
 
    public static SourceBuilder csv(String splitter, boolean skipFirstLine) {
       return new DataFrameBuilderX().csv(splitter, skipFirstLine);
+   }
+
+   public static DataTableBuilder blank() {
+      return new DataFrameBuilderX().blank();
    }
 }
