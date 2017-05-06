@@ -129,7 +129,11 @@ for(int i = 0; i < testingData.rowCount(); ++i){
 
 The line "glm.transform(..)" perform the regression 
 
-## Another example on linear regression
+# Sample code
+
+### Sample code for linear regression
+
+The sample code below shows the linear regression example
 
 ```
 DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()
@@ -168,9 +172,46 @@ for(int i = 0; i < crossValidationData.rowCount(); ++i){
 System.out.println("Coefficients: " + glm.getCoefficients());
 ```
 
+### Sample code for multi-class classification
+
+The sample code below perform multi class classification using the logistic regression model as the generator
+
+```java
+InputStream irisStream = FileUtils.getResource("iris.data");
+DataFrame irisData = DataQuery.csv(",", false)
+      .from(irisStream)
+      .selectColumn(0).asInput("Sepal Length")
+      .selectColumn(1).asInput("Sepal Width")
+      .selectColumn(2).asInput("Petal Length")
+      .selectColumn(3).asInput("Petal Width")
+      .selectColumn(4).transform(label -> label).asOutput("Iris Type")
+      .build();
+
+TupleTwo<DataFrame, DataFrame> parts = irisData.shuffle().split(0.9);
+
+DataFrame trainingData = parts._1();
+DataFrame crossValidationData = parts._2();
+
+System.out.println(crossValidationData.head(10));
+
+OneVsOneGlmClassifier multiClassClassifier = Glm.oneVsOne(Glm::logistic);
+multiClassClassifier.fit(trainingData);
+
+ClassifierEvaluator evaluator = new ClassifierEvaluator();
+
+for(int i=0; i < crossValidationData.rowCount(); ++i) {
+ String predicted = multiClassClassifier.classify(crossValidationData.row(i));
+ String actual = crossValidationData.row(i).categoricalTarget();
+ System.out.println("predicted: " + predicted + "\tactual: " + actual);
+ evaluator.evaluate(actual, predicted);
+}
+
+evaluator.report();
+```
+
 # Background on GLM 
 
-## Introduction
+### Introduction
 
 GLM is generalized linear model for exponential family of distribution model b = g(a).
 g(a) is the inverse link function.
@@ -203,7 +244,7 @@ min || g(A * x) - b ||^2
 ```
 
 
-## Iteratively Re-weighted Least Squares estimation (IRLS)
+### Iteratively Re-weighted Least Squares estimation (IRLS)
 
 In regressions, we tried to find a set of model coefficient such for:
 

@@ -226,5 +226,18 @@ public class ClassifierEvaluator implements Serializable {
       return 2 * (precisionAvg * recallAvg) / (precisionAvg + recallAvg);
    }
 
+   public String getSummary() {
+      StringBuilder sb = new StringBuilder();
+      sb.append("accuracy: ").append(getAccuracy());
+      sb.append("\nmis-classification: ").append(getMisclassificationRate());
+      sb.append("\nmacro f1-score: ").append(getMacroF1Score());
+      sb.append("\nmicro f1-score: ").append(getMicroF1Score());
+
+      return sb.toString();
+   }
+
+   public void report(){
+      System.out.println(getSummary());
+   }
 
 }

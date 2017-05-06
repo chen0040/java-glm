@@ -29,7 +29,7 @@ public class DataQueryUnitTest {
 
       boolean skipFirstLine = true;
       String columnSplitter = ",";
-      InputStream inputStream = FileUtils.getResourceFile("contraception.csv");
+      InputStream inputStream = FileUtils.getResource("contraception.csv");
       DataFrame frame = DataQuery.csv(columnSplitter, skipFirstLine)
               .from(inputStream)
               .selectColumn(column_livch).asInput("livch")
@@ -55,7 +55,7 @@ public class DataQueryUnitTest {
 
    @Test
    public void test_libsvm() throws IOException {
-      DataFrame frame = DataQuery.libsvm().from(FileUtils.getResourceFile("heart_scale.txt")).build();
+      DataFrame frame = DataQuery.libsvm().from(FileUtils.getResource("heart_scale.txt")).build();
 
       for(int i=0; i < 10; ++i){
          logger.info("row[{}]: {}", i, frame.row(i));

@@ -112,6 +112,7 @@ public class GlmAlgorithm implements Cloneable {
         }
     };
 
+
     public GlmAlgorithm(){
 
     }
@@ -312,5 +313,6 @@ public class GlmAlgorithm implements Cloneable {
     private void updateStatistics() {
         mStats = new GlmStatistics(A, b, glmCoefficients);
     }
+
 }
 

@@ -13,6 +13,8 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Supplier;
+
 
 /**
  * Created by xschen on 16/8/15.
@@ -27,7 +29,9 @@ public class Glm {
     private GlmDistributionFamily distributionFamily;
     private GlmSolverType solverType;
     private Coefficients coefficients;
-    
+    private String name;
+
+
     public void copy(Glm that){
         solver = that.solver == null ? null : that.solver.makeCopy();
         distributionFamily = that.distributionFamily;
@@ -145,5 +149,19 @@ public class Glm {
         Glm glm = new Glm();
         glm.setDistributionFamily(GlmDistributionFamily.Normal);
         return glm;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+
+    public static OneVsOneGlmClassifier oneVsOne() {
+        return new OneVsOneGlmClassifier();
+    }
+
+    public static OneVsOneGlmClassifier oneVsOne(Supplier<Glm> binaryClassifierGenerator) {
+        return new OneVsOneGlmClassifier(binaryClassifierGenerator);
     }
 }

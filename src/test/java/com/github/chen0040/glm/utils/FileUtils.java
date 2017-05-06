@@ -9,7 +9,7 @@ import java.io.InputStream;
  * Created by xschen on 12/8/15.
  */
 public class FileUtils {
-    public static InputStream getResourceFile(String fileName) throws IOException {
+    public static InputStream getResource(String fileName) throws IOException {
 
         ClassLoader classLoader = FileUtils.class.getClassLoader();
         return classLoader.getResource(fileName).openStream();

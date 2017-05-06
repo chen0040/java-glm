@@ -34,7 +34,7 @@ public class GlmUnitTest {
 
         boolean skipFirstLine = true;
         String columnSplitter = ",";
-        InputStream inputStream = FileUtils.getResourceFile("contraception.csv");
+        InputStream inputStream = FileUtils.getResource("contraception.csv");
         frame = DataQuery.csv(columnSplitter, skipFirstLine)
                 .from(inputStream)
                 .selectColumn(column_livch).transform(cell -> cell.equals("1") ? 1.0 : 0.0).asInput("livch1")
