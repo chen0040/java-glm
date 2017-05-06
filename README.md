@@ -26,6 +26,18 @@ For the solvers, the current implementation of GLM supports a number of variants
 * IRLS with QR factorization
 * IRLS with SVD factorization
 
+# Install
+
+Add the following to dependencies of your pom file:
+
+```
+<dependency>
+  <groupId>com.github.chen0040</groupId>
+  <artifactId>java-glm</artifactId>
+  <version>1.0.1</version>
+</dependency>
+```
+
 # Usage
 
 ## Step 1. Create a data frame
