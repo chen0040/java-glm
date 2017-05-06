@@ -1,8 +1,12 @@
 package com.github.chen0040.glm.data;
 
 
+import com.github.chen0040.glm.utils.CollectionUtils;
+import com.github.chen0040.glm.utils.TupleTwo;
+
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -47,7 +51,8 @@ public class BasicDataFrame implements DataFrame {
 
    @Override public void lock() {
       Map<String, Set<Double>> counts = new HashMap<>();
-      Set<String> outputs = new HashSet<>();
+      Set<String> numericOutputs = new HashSet<>();
+      Set<String> categoricalOutputs = new HashSet<>();
       for(DataRow row : rows){
          List<String> keys = row.getColumnNames();
          for(String key: keys) {
@@ -62,7 +67,8 @@ public class BasicDataFrame implements DataFrame {
 
             set.add(row.getCell(key));
          }
-         outputs.addAll(row.getTargetColumnNames());
+         numericOutputs.addAll(row.getTargetColumnNames());
+         categoricalOutputs.addAll(row.getCategoricalTargetColumnNames());
       }
 
       inputDataColumns.clear();
@@ -77,23 +83,25 @@ public class BasicDataFrame implements DataFrame {
       }
 
       outputDataColumns.clear();
-      for(String o : outputs) {
-         outputDataColumns.add(new OutputDataColumn(o));
-      }
+      outputDataColumns.addAll(numericOutputs.stream().map(o -> new OutputDataColumn(o, false)).collect(Collectors.toList()));
+      outputDataColumns.addAll(categoricalOutputs.stream().map(o -> new OutputDataColumn(o, true)).collect(Collectors.toList()));
 
       inputDataColumns.sort((a, b) -> a.getColumnName().compareTo(b.getColumnName()));
       outputDataColumns.sort((a, b) -> a.getColumnName().compareTo(b.getColumnName()));
 
       List<String> inputColumns = inputDataColumns.stream().map(InputDataColumn::getColumnName).collect(Collectors.toList());
-      List<String> outputColumns = outputDataColumns.stream().map(OutputDataColumn::getColumnName).collect(Collectors.toList());
+      List<String> numericOutputColumns = outputDataColumns.stream().filter(c -> !c.isCategorical()).map(OutputDataColumn::getColumnName).collect(Collectors.toList());
+      List<String> categoricalOutputColumns = outputDataColumns.stream().filter(OutputDataColumn::isCategorical).map(OutputDataColumn::getColumnName).collect(Collectors.toList());
 
       inputColumns.sort(String::compareTo);
-      outputColumns.sort(String::compareTo);
+      numericOutputColumns.sort(String::compareTo);
+      categoricalOutputColumns.sort(String::compareTo);
 
       for(int i=0; i < rowCount(); ++i) {
          DataRow row = row(i);
          row.setColumnNames(inputColumns);
-         row.setTargetColumnNames(outputColumns);
+         row.setTargetColumnNames(numericOutputColumns);
+         row.setCategoricalTargetColumnNames(categoricalOutputColumns);
       }
 
       locked = true;
@@ -125,4 +133,48 @@ public class BasicDataFrame implements DataFrame {
       return sb.toString();
    }
 
+
+   @Override public DataFrame shuffle() {
+      Random random = new Random(System.currentTimeMillis());
+      for(int i=1; i < rows.size(); ++i) {
+         int j = random.nextInt(i+1);
+         CollectionUtils.exchange(rows, i, j);
+      }
+      return this;
+   }
+
+
+   @Override public TupleTwo<DataFrame, DataFrame> split(double ratio) {
+      assert this.locked;
+
+      BasicDataFrame frame1 = new BasicDataFrame();
+      BasicDataFrame frame2 = new BasicDataFrame();
+
+      frame1.inputDataColumns.addAll(inputDataColumns.stream().map(InputDataColumn::makeCopy).collect(Collectors.toList()));
+      frame2.inputDataColumns.addAll(inputDataColumns.stream().map(InputDataColumn::makeCopy).collect(Collectors.toList()));
+
+      frame1.outputDataColumns.addAll(outputDataColumns.stream().map(OutputDataColumn::makeCopy).collect(Collectors.toList()));
+      frame2.outputDataColumns.addAll(outputDataColumns.stream().map(OutputDataColumn::makeCopy).collect(Collectors.toList()));
+
+      int split = (int)(rows.size() * ratio);
+      for(int i=0; i < split; ++i) {
+         frame1.addRow(rows.get(i).makeCopy());
+      }
+      for(int i=split; i < rows.size(); ++i){
+         frame2.addRow(rows.get(i).makeCopy());
+      }
+
+      return new TupleTwo<>(frame1, frame2);
+
+   }
+
+
+   @Override public Stream<DataRow> stream() {
+      return rows.stream();
+   }
+
+
+   @Override public Iterator<DataRow> iterator() {
+      return rows.iterator();
+   }
 }

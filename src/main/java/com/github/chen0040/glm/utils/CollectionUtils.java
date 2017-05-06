@@ -34,4 +34,10 @@ public class CollectionUtils {
       }
       return result;
    }
+
+   public static <T> void exchange(List<T> a, int i, int j) {
+      T temp = a.get(i);
+      a.set(i, a.get(j));
+      a.set(j, temp);
+   }
 }
