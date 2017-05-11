@@ -1,11 +1,11 @@
 package com.github.chen0040.glm.solvers;
 
-import com.github.chen0040.glm.data.DataFrame;
-import com.github.chen0040.glm.data.DataQuery;
+import com.github.chen0040.data.frame.DataFrame;
+import com.github.chen0040.data.frame.DataQuery;
 import com.github.chen0040.glm.enums.GlmSolverType;
-import com.github.chen0040.glm.evaluators.BinaryClassifierEvaluator;
+import com.github.chen0040.data.evaluators.BinaryClassifierEvaluator;
 import com.github.chen0040.glm.utils.FileUtils;
-import com.github.chen0040.glm.utils.StringUtils;
+import com.github.chen0040.data.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeMethod;

@@ -1,9 +1,9 @@
 package com.github.chen0040.glm.applications;
 
 
-import com.github.chen0040.glm.data.DataFrame;
-import com.github.chen0040.glm.data.DataQuery;
-import com.github.chen0040.glm.data.Sampler;
+import com.github.chen0040.data.frame.DataFrame;
+import com.github.chen0040.data.frame.DataQuery;
+import com.github.chen0040.data.frame.Sampler;
 import com.github.chen0040.glm.enums.GlmSolverType;
 import com.github.chen0040.glm.solvers.Glm;
 import org.slf4j.Logger;

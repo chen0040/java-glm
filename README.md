@@ -40,61 +40,8 @@ Add the following to dependencies of your pom file:
 
 # Usage
 
-## Step 1. Create a data frame
 
-Suppose you have a csv file named contraception.csv that has the following file format:
-
-```
-"","woman","district","use","livch","age","urban"
-"1","1","1","N","3+",18.44,"Y"
-"2","2","1","N","0",-5.5599,"Y"
-"3","3","1","N","2",1.44,"Y"
-"4","4","1","N","3+",8.44,"Y"
-"5","5","1","N","0",-13.559,"Y"
-"6","6","1","N","0",-11.56,"Y"
-```
-
-An example of java code to create a data frame from the above CSV file:
-
-```java
-import com.github.chen0040.glm.data.DataFrame;
-import com.github.chen0040.glm.data.DataQuery;
-import com.github.chen0040.glm.utils.StringUtils;
-
-int column_use = 3;
-int column_livch = 4;
-int column_age = 5;
-int column_urban = 6;
-boolean skipFirstLine = true;
-String columnSplitter = ",";
-InputStream inputStream = new FileInputStream("contraception.csv");
-DataFrame frame = DataQuery.csv(columnSplitter, skipFirstLine)
-        .from(inputStream)
-        .selectColumn(column_livch).transform(cell -> cell.equals("1") ? 1.0 : 0.0).asInput("livch1")
-        .selectColumn(column_livch).transform(cell -> cell.equals("2") ? 1.0 : 0.0).asInput("livch2")
-        .selectColumn(column_livch).transform(cell -> cell.equals("3+") ? 1.0 : 0.0).asInput("livch3")
-        .selectColumn(column_age).asInput("age")
-        .selectColumn(column_age).transform(cell -> Math.pow(StringUtils.parseDouble(cell), 2)).asInput("age^2")
-        .selectColumn(column_urban).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asInput("urban")
-        .selectColumn(column_use).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asOutput("use")
-        .build();
-```
-
-The code above create a data frame which has the following columns
-
-* livch1 (input): value = 1 if the "livch" column of the CSV contains value 1 ; 0 otherwise
-* livch2 (input): value = 1 if the "livch" column of the CSV contains value 2 ; 0 otherwise
-* livch3 (input): value = 1 if the "livch" column of the CSV contains value 3+ ; 0 otherwise
-* age (input): value = numeric value in the "age" column of the CSV
-* age^2 (input): value = square of numeric value in the "age" column of the CSV
-* urban (input): value = 1 if the "urban" column of the CSV has value "Y" ; 0 otherwise
-* use (output): value = 1 if the "use" column of the CSV has value "Y" ; 0 otherwise
-
-Currently csv files and the libsvm format are supported for creating data frame, to load a libsvm-format file, call "DataQuery.libsvm()" instead of "DataQuery.csv(..)".
- 
-In the future more option will be added for the supported format
-
-## Step 2: Create and train the glm against the training data in step 1
+## Step 1: Create and train the glm against the training data in step 1
  
 Suppose you want to create logistic regression model from GLM and train the logistic regression model against the data frame 
 
@@ -102,42 +49,33 @@ Suppose you want to create logistic regression model from GLM and train the logi
 import com.github.chen0040.glm.solvers.Glm;
 import com.github.chen0040.glm.enums.GlmSolverType;
 
+trainingData = loadTrainingData();
+
 Glm glm = Glm.logistic();
 glm.setSolverType(GlmSolverType.GlmIrls);
-glm.fit(frame);
+glm.fit(trainingData);
 ```
+
+The "trainingData" is a data frame (Please refers to this [link](https://github.com/chen0040/java-data-frame) on how to create a data frame from file or from scratch)
 
 The line "Glm.logistic()" create the logistic regression model, which can be easily changed to create other regression models (For example, calling "Glm.linear()" create a linear regression model) 
 
 The line "glm.fit(..)" performs the GLM training.
 
-## Step 3: Use the trained regression model to predict on new data
-
-To run the trained glm against the test data, load the testing data into another data frame:
-
-```java
-InputStream inputStream = new FileInputStream("contraception-validation.csv");
-DataFrame testingData = DataQuery.csv(columnSplitter, skipFirstLine)
-        .from(inputStream)
-        .selectColumn(column_livch).transform(cell -> cell.equals("1") ? 1.0 : 0.0).asInput("livch1")
-        .selectColumn(column_livch).transform(cell -> cell.equals("2") ? 1.0 : 0.0).asInput("livch2")
-        .selectColumn(column_livch).transform(cell -> cell.equals("3+") ? 1.0 : 0.0).asInput("livch3")
-        .selectColumn(column_age).asInput("age")
-        .selectColumn(column_age).transform(cell -> Math.pow(StringUtils.parseDouble(cell), 2)).asInput("age^2")
-        .selectColumn(column_urban).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asInput("urban")
-        .selectColumn(column_use).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asOutput("use")
-        .build();
-```
+## Step 2: Use the trained regression model to predict on new data
 
 The trained glm can then run on the testing data, below is a java code example for logistic regression:
 
 ```java
+testingData = loadTestingData();
 for(int i = 0; i < testingData.rowCount(); ++i){
     boolean predicted = glm.transform(testingData.row(i)) > 0.5;
     boolean actual = frame.row(i).target() > 0.5;
     System.out.println("predicted(Irls): " + predicted + "\texpected: " + actual);
 }
 ```
+
+The "testingData" is a data frame
 
 The line "glm.transform(..)" perform the regression 
 

@@ -1,8 +1,8 @@
 package com.github.chen0040.glm.metrics;
 
 
-import com.github.chen0040.glm.data.DataFrame;
-import com.github.chen0040.glm.data.DataRow;
+import com.github.chen0040.data.frame.DataFrame;
+import com.github.chen0040.data.frame.DataRow;
 import com.github.chen0040.glm.enums.GlmDistributionFamily;
 import com.github.chen0040.glm.maths.Mean;
 import com.github.chen0040.glm.maths.StdDev;

@@ -1,13 +1,13 @@
 package com.github.chen0040.glm.solvers;
 
 
-import com.github.chen0040.glm.data.Coefficients;
-import com.github.chen0040.glm.data.DataFrame;
+import com.github.chen0040.data.frame.Coefficients;
+import com.github.chen0040.data.frame.DataFrame;
 import com.github.chen0040.glm.enums.GlmSolverType;
 import com.github.chen0040.glm.metrics.GlmStatistics;
-import com.github.chen0040.glm.data.DataRow;
+import com.github.chen0040.data.frame.DataRow;
 import com.github.chen0040.glm.enums.GlmDistributionFamily;
-import com.github.chen0040.glm.utils.CollectionUtils;
+import com.github.chen0040.data.utils.CollectionUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;

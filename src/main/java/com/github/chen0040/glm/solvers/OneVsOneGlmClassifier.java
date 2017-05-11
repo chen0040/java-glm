@@ -1,9 +1,9 @@
 package com.github.chen0040.glm.solvers;
 
-import com.github.chen0040.glm.data.BasicDataFrame;
-import com.github.chen0040.glm.data.DataFrame;
-import com.github.chen0040.glm.data.DataRow;
-import com.github.chen0040.glm.utils.TupleTwo;
+import com.github.chen0040.data.frame.BasicDataFrame;
+import com.github.chen0040.data.frame.DataFrame;
+import com.github.chen0040.data.frame.DataRow;
+import com.github.chen0040.data.utils.TupleTwo;
 
 import java.util.*;
 import java.util.function.Supplier;

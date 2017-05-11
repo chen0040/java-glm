@@ -1,13 +1,13 @@
 package com.github.chen0040.glm.applications;
 
 
-import com.github.chen0040.glm.data.DataFrame;
-import com.github.chen0040.glm.data.DataQuery;
-import com.github.chen0040.glm.evaluators.ClassifierEvaluator;
+import com.github.chen0040.data.frame.DataFrame;
+import com.github.chen0040.data.frame.DataQuery;
+import com.github.chen0040.data.evaluators.ClassifierEvaluator;
 import com.github.chen0040.glm.solvers.Glm;
 import com.github.chen0040.glm.solvers.OneVsOneGlmClassifier;
 import com.github.chen0040.glm.utils.FileUtils;
-import com.github.chen0040.glm.utils.TupleTwo;
+import com.github.chen0040.data.utils.TupleTwo;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
