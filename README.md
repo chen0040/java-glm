@@ -34,7 +34,7 @@ Add the following to dependencies of your pom file:
 <dependency>
   <groupId>com.github.chen0040</groupId>
   <artifactId>java-glm</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
 </dependency>
 ```
 
