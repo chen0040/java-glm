@@ -1,7 +1,6 @@
 package com.github.chen0040.glm.solvers;
 
 
-import com.github.chen0040.data.frame.Coefficients;
 import com.github.chen0040.data.frame.DataFrame;
 import com.github.chen0040.glm.enums.GlmSolverType;
 import com.github.chen0040.glm.metrics.GlmStatistics;
@@ -100,7 +99,7 @@ public class Glm {
         int m = dataFrame.rowCount();
         double[][] X = new double[m][];
 
-        coefficients.setDescriptors(dataFrame.getInputColumns());
+        coefficients.setDescriptors(dataFrame.rowArrayDescriptors());
 
         double[] y = new double[m];
         for(int i=0; i < m; ++i){

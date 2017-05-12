@@ -32,17 +32,17 @@ public class GlmUnitTest {
         int column_age = 5;
         int column_urban = 6;
 
-        boolean skipFirstLine = true;
         String columnSplitter = ",";
         InputStream inputStream = FileUtils.getResource("contraception.csv");
-        frame = DataQuery.csv(columnSplitter, skipFirstLine)
+        frame = DataQuery.csv(columnSplitter)
                 .from(inputStream)
+                .skipRows(1)
                 .selectColumn(column_livch).transform(cell -> cell.equals("1") ? 1.0 : 0.0).asInput("livch1")
                 .selectColumn(column_livch).transform(cell -> cell.equals("2") ? 1.0 : 0.0).asInput("livch2")
-                .selectColumn(column_livch).transform(cell -> cell.equals("3+") ? 1.0 : 0.0).asInput("livch3")
-                .selectColumn(column_age).asInput("age")
+                .selectColumn(column_livch).transform(cell -> cell.equals("3+") ? 1.0 : 0.0).asInput("livch3+")
+                .selectColumn(column_age).asNumeric().asInput("age")
                 .selectColumn(column_age).transform(cell -> Math.pow(StringUtils.parseDouble(cell), 2)).asInput("age^2")
-                .selectColumn(column_urban).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asInput("urban")
+                .selectColumn(column_urban).asCategory().asInput("urban")
                 .selectColumn(column_use).transform(cell -> cell.equals("Y") ? 1.0 : 0.0).asOutput("use")
                 .build();
 
