@@ -128,7 +128,7 @@ The sample code below perform multi class classification using the logistic regr
 
 ```java
 InputStream irisStream = FileUtils.getResource("iris.data");
-DataFrame irisData = DataQuery.csv(",", false)
+DataFrame irisData = DataQuery.csv(",")
       .from(irisStream)
       .selectColumn(0).asNumeric().asInput("Sepal Length")
       .selectColumn(1).asNumeric().asInput("Sepal Width")
