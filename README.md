@@ -6,6 +6,18 @@ Package implements the generalized linear model in Java
 
 ![GLM](glm.png)
 
+# Install
+
+Add the following to dependencies of your pom file:
+
+```
+<dependency>
+  <groupId>com.github.chen0040</groupId>
+  <artifactId>java-glm</artifactId>
+  <version>1.0.5</version>
+</dependency>
+```
+
 # Features
 
 The current implementation of GLM supports as many distribution families as glm package in R:
@@ -26,17 +38,7 @@ For the solvers, the current implementation of GLM supports a number of variants
 * IRLS with QR factorization
 * IRLS with SVD factorization
 
-# Install
 
-Add the following to dependencies of your pom file:
-
-```
-<dependency>
-  <groupId>com.github.chen0040</groupId>
-  <artifactId>java-glm</artifactId>
-  <version>1.0.4</version>
-</dependency>
-```
 
 # Usage
 
@@ -120,6 +122,52 @@ for(int i = 0; i < crossValidationData.rowCount(); ++i){
 }
 
 System.out.println("Coefficients: " + glm.getCoefficients());
+```
+
+### Sample code for logistic regression
+
+The sample code below performs binary classification using logistic regression:
+
+```java
+InputStream inputStream = new FileInputStream("heart_scale.txt");
+DataFrame dataFrame = DataQuery.libsvm().from(inputStream).build();
+
+for(int i=0; i < dataFrame.rowCount(); ++i){
+ DataRow row = dataFrame.row(i);
+ String targetColumn = row.getTargetColumnNames().get(0);
+ row.setTargetCell(targetColumn, row.getTargetCell(targetColumn) == -1 ? 0 : 1); // change output from (-1, +1) to (0, 1)
+}
+
+TupleTwo<DataFrame, DataFrame> miniFrames = dataFrame.shuffle().split(0.9);
+DataFrame trainingData = miniFrames._1();
+DataFrame crossValidationData = miniFrames._2();
+
+Glm algorithm = Glm.logistic();
+algorithm.setSolverType(GlmSolverType.GlmIrlsQr);
+algorithm.fit(trainingData);
+
+double threshold = 1.0;
+for(int i = 0; i < trainingData.rowCount(); ++i){
+ double prob = algorithm.transform(trainingData.row(i));
+ if(trainingData.row(i).target() == 1 && prob < threshold){
+    threshold = prob;
+ }
+}
+logger.info("threshold: {}",threshold);
+
+
+BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
+
+for(int i = 0; i < crossValidationData.rowCount(); ++i){
+ double prob = algorithm.transform(crossValidationData.row(i));
+ boolean predicted = prob > 0.5;
+ boolean actual = crossValidationData.row(i).target() > 0.5;
+ evaluator.evaluate(actual, predicted);
+ System.out.println("probability of positive: " + prob);
+ System.out.println("predicted: " + predicted + "\tactual: " + actual);
+}
+
+evaluator.report();
 ```
 
 ### Sample code for multi-class classification

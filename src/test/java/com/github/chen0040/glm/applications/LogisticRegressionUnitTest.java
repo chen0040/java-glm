@@ -3,14 +3,19 @@ package com.github.chen0040.glm.applications;
 
 import com.github.chen0040.data.frame.DataFrame;
 import com.github.chen0040.data.frame.DataQuery;
+import com.github.chen0040.data.frame.DataRow;
 import com.github.chen0040.data.frame.Sampler;
+import com.github.chen0040.data.utils.TupleTwo;
 import com.github.chen0040.glm.enums.GlmSolverType;
 import com.github.chen0040.data.evaluators.BinaryClassifierEvaluator;
 import com.github.chen0040.glm.solvers.Glm;
+import com.github.chen0040.glm.utils.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Random;
 
 
@@ -41,48 +46,43 @@ public class LogisticRegressionUnitTest {
 
    // unit testing based on example from http://scikit-learn.org/stable/auto_examples/svm/plot_oneclass.html#
    @Test
-   public void testSimple(){
+   public void testSimple() throws IOException {
 
-      DataQuery.DataFrameQueryBuilder schema = DataQuery.blank()
-              .newInput("c1")
-              .newInput("c2")
-              .newOutput("anomaly")
-              .end();
+      InputStream inputStream = FileUtils.getResource("heart_scale.txt");
+      DataFrame dataFrame = DataQuery.libsvm().from(inputStream).build();
 
-      Sampler.DataSampleBuilder negativeSampler = new Sampler()
-              .forColumn("c1").generate((name, index) -> randn() * 0.3 + (index % 2 == 0 ? -2 : 2))
-              .forColumn("c2").generate((name, index) -> randn() * 0.3 + (index % 2 == 0 ? -2 : 2))
-              .forColumn("anomaly").generate((name, index) -> 0.0)
-              .end();
+      for(int i=0; i < dataFrame.rowCount(); ++i){
+         DataRow row = dataFrame.row(i);
+         String targetColumn = row.getTargetColumnNames().get(0);
+         row.setTargetCell(targetColumn, row.getTargetCell(targetColumn) == -1 ? 0 : 1);
+      }
 
-      Sampler.DataSampleBuilder positiveSampler = new Sampler()
-              .forColumn("c1").generate((name, index) -> rand(-4, 4))
-              .forColumn("c2").generate((name, index) -> rand(-4, 4))
-              .forColumn("anomaly").generate((name, index) -> 1.0)
-              .end();
-
-      DataFrame trainingData = schema.build();
-
-      trainingData = negativeSampler.sample(trainingData, 200);
-      trainingData = positiveSampler.sample(trainingData, 200);
-
-      System.out.println(trainingData.head(10));
-
-      DataFrame crossValidationData = schema.build();
-
-      crossValidationData = negativeSampler.sample(crossValidationData, 40);
-      crossValidationData = positiveSampler.sample(crossValidationData, 40);
+      TupleTwo<DataFrame, DataFrame> miniFrames = dataFrame.shuffle().split(0.9);
+      DataFrame trainingData = miniFrames._1();
+      DataFrame crossValidationData = miniFrames._2();
 
       Glm algorithm = Glm.logistic();
       algorithm.setSolverType(GlmSolverType.GlmIrlsQr);
       algorithm.fit(trainingData);
 
+      double threshold = 1.0;
+      for(int i = 0; i < trainingData.rowCount(); ++i){
+         double prob = algorithm.transform(trainingData.row(i));
+         if(trainingData.row(i).target() == 1 && prob < threshold){
+            threshold = prob;
+         }
+      }
+      logger.info("threshold: {}",threshold);
+
+
       BinaryClassifierEvaluator evaluator = new BinaryClassifierEvaluator();
 
       for(int i = 0; i < crossValidationData.rowCount(); ++i){
-         boolean predicted = algorithm.transform(crossValidationData.row(i)) > 0.5;
+         double prob = algorithm.transform(crossValidationData.row(i));
+         boolean predicted = prob > 0.5;
          boolean actual = crossValidationData.row(i).target() > 0.5;
          evaluator.evaluate(actual, predicted);
+         logger.info("probability of positive: {}", prob);
          logger.info("predicted: {}\texpected: {}", predicted, actual);
       }
 
