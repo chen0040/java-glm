@@ -168,7 +168,7 @@ public class GlmAlgorithmIrls extends GlmAlgorithm {
 
             // solve x for At * W * A * x = At * W * z
             Matrix AtWA = AtW.times(A); // AtWA: n x n
-            AtWAInv = AtWA.inverse();
+            AtWAInv = Matrices.inverse(AtWA);
             x = AtWAInv.times(AtW).times(z);
 
             if ((x.minus(x_old)).norm2() < mTol) {

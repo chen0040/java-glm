@@ -9,6 +9,7 @@ import com.github.chen0040.glm.enums.GlmDistributionFamily;
 import com.github.chen0040.data.utils.CollectionUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,12 +142,14 @@ public class Glm {
     public static Glm logistic() {
         Glm glm = new Glm();
         glm.setDistributionFamily(GlmDistributionFamily.Binomial);
+        //glm.setSolverType(GlmSolverType.GlmIrlsQr);
         return glm;
     }
 
     public static Glm linear() {
         Glm glm = new Glm();
         glm.setDistributionFamily(GlmDistributionFamily.Normal);
+        //glm.setSolverType(GlmSolverType.GlmIrlsQr);
         return glm;
     }
 

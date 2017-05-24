@@ -3,6 +3,7 @@ package com.github.chen0040.glm.metrics;
 import Jama.Matrix;
 import com.github.chen0040.glm.maths.Mean;
 import com.github.chen0040.glm.maths.StdDev;
+import com.github.chen0040.glm.solvers.Matrices;
 
 
 /**
@@ -79,7 +80,7 @@ public class GlmStatistics implements Cloneable {
             }
         }
 
-        Matrix AtAInv = AtA.inverse();
+        Matrix AtAInv = Matrices.inverse(AtA);
         double sigmaSq = residualStdDev * residualStdDev;
 
         VcovMatrix = new double[n][];

@@ -9,6 +9,8 @@ import com.github.chen0040.glm.metrics.GlmStatistics;
 import com.github.chen0040.glm.maths.Mean;
 import com.github.chen0040.glm.maths.StdDev;
 import com.github.chen0040.glm.maths.Variance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
@@ -30,6 +32,7 @@ public class GlmAlgorithmIrlsQrNewton extends GlmAlgorithm {
     private Matrix A;
     private Matrix b;
     private Matrix At;
+    private static final Logger logger = LoggerFactory.getLogger(GlmAlgorithmIrlsQrNewton.class);
 
     @Override
     public void copy(GlmAlgorithm rhs){
@@ -265,40 +268,45 @@ public class GlmAlgorithmIrlsQrNewton extends GlmAlgorithm {
 
     protected void updateStatistics(double[] W) {
 
-        Matrix AtWA = scalarMultiply(At, W).times(A);
+        try {
+            Matrix AtWA = scalarMultiply(At, W).times(A);
 
-        Matrix AtWAInv = AtWA.inverse();
+            Matrix AtWAInv = Matrices.inverse(AtWA);
 
-        int n = AtWAInv.getRowDimension();
-        int m = b.getRowDimension();
+            int n = AtWAInv.getRowDimension();
+            int m = b.getRowDimension();
 
-        double[] stdErrors = mStats.getStandardErrors();
-        double[][] VCovMatrix = mStats.getVCovMatrix();
-        double[] residuals = mStats.getResiduals();
+            double[] stdErrors = mStats.getStandardErrors();
+            double[][] VCovMatrix = mStats.getVCovMatrix();
+            double[] residuals = mStats.getResiduals();
 
-        for (int i = 0; i < n; ++i) {
-            stdErrors[i] = Math.sqrt(AtWAInv.get(i, i));
-            for (int j = 0; j < n; ++j) {
-                VCovMatrix[i][j] = AtWAInv.get(i, j);
+            for (int i = 0; i < n; ++i) {
+                stdErrors[i] = Math.sqrt(AtWAInv.get(i, i));
+                for (int j = 0; j < n; ++j) {
+                    VCovMatrix[i][j] = AtWAInv.get(i, j);
+                }
             }
-        }
 
-        double[] outcomes = new double[m];
-        for (int i = 0; i < m; i++) {
-            double cross_prod = 0;
-            for (int j = 0; j < n; ++j) {
-                cross_prod += A.get(i, j) * glmCoefficients[j];
+            double[] outcomes = new double[m];
+            for (int i = 0; i < m; i++) {
+                double cross_prod = 0;
+                for (int j = 0; j < n; ++j) {
+                    cross_prod += A.get(i, j) * glmCoefficients[j];
+                }
+                residuals[i] = b.get(i, 0) - linkFunc.GetInvLink(cross_prod);
+                outcomes[i] = b.get(i, 0);
             }
-            residuals[i] = b.get(i, 0) - linkFunc.GetInvLink(cross_prod);
-            outcomes[i] = b.get(i, 0);
+
+            mStats.setResidualStdDev(StdDev.apply(residuals, 0));
+            mStats.setResponseMean(Mean.apply(outcomes));
+            mStats.setResponseVariance(Variance.apply(outcomes, mStats.getResponseMean()));
+
+            mStats.setR2(1 - mStats.getResidualStdDev() * mStats.getResidualStdDev() / mStats.getResponseVariance());
+            mStats.setAdjustedR2(1 - mStats.getResidualStdDev() * mStats.getResidualStdDev() / mStats.getResponseVariance() * (n - 1) / (n - glmCoefficients.length
+                    - 1));
+        }catch(Exception exception){
+            logger.error("update statistics failed", exception);
         }
-
-        mStats.setResidualStdDev(StdDev.apply(residuals, 0));
-        mStats.setResponseMean(Mean.apply(outcomes));
-        mStats.setResponseVariance(Variance.apply(outcomes, mStats.getResponseMean()));
-
-        mStats.setR2(1 - mStats.getResidualStdDev() * mStats.getResidualStdDev() / mStats.getResponseVariance());
-        mStats.setAdjustedR2(1 - mStats.getResidualStdDev() * mStats.getResidualStdDev() / mStats.getResponseVariance() * (n - 1) / (n - glmCoefficients.length - 1));
     }
 }
 

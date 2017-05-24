@@ -245,7 +245,7 @@ public class GlmAlgorithmIrlsSvdNewton extends GlmAlgorithm {
 
     protected void updateStatistics(double[] W) {
         Matrix AtWA = scalarMultiply(At, W).times(A);
-        Matrix AtWAInv = AtWA.inverse();
+        Matrix AtWAInv = Matrices.inverse(AtWA);
 
         int n = AtWAInv.getRowDimension();
         int m = b.getRowDimension();
